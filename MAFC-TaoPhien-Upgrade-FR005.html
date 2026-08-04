@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup nâng cấp · Tạo phiên Callbot (FR-005)</title>
+<style>
+  :root{
+    --bg:#EEF1F5; --card:#FFFFFF; --ink:#1F2A37; --sub:#5B6675; --label:#6B7480;
+    --green:#1BA85C; --green-d:#17914E; --green-soft:#E7F6EE;
+    --input:#F4F6F8; --border:#E3E8EE; --border2:#D6DCE3; --link:#3B82F6;
+    --up:#F59E0B; --up-bg:#FFFBEB; --up-line:#F5C560; --up-badge-bg:#FEF3C7; --up-badge-tx:#8A5A00;
+    --rail:#1E2A3A;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","Be Vietnam Pro","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.45;}
+
+  .anno{position:sticky;top:0;z-index:50;background:#0F1620;color:#fff;padding:11px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.18);}
+  .anno b{font-weight:680;}
+  .anno .leg{display:flex;align-items:center;gap:7px;color:#C7D0DA;}
+  .swatch{width:14px;height:14px;border-radius:4px;}
+  .swatch.exist{background:#fff;border:1px solid #4A5666;}
+  .swatch.up{background:var(--up-bg);border:1.5px dashed var(--up);}
+  .anno button{margin-left:auto;background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 15px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+  .anno button:hover{background:var(--green-d);}
+  .anno .fr{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#22303F;padding:2px 7px;border-radius:5px;color:#9FE6BE;}
+
+  .wrap{max-width:1320px;margin:0 auto;padding:22px 22px 60px;}
+  .phead{display:flex;align-items:center;gap:14px;padding:6px 4px 14px;}
+  .phead .back{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--border);display:grid;place-items:center;color:#4A5666;font-size:18px;box-shadow:0 1px 2px rgba(16,24,40,.05);}
+  .phead h1{font-size:21px;margin:0;font-weight:680;}
+  .phead .reset{margin-left:auto;color:var(--sub);font-size:14px;}
+  .pbar{height:4px;background:var(--green);border-radius:3px;width:110px;margin:0 4px 18px;}
+
+  .panel{background:var(--card);border-radius:18px;box-shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04);padding:24px 26px;}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .panel-h h2{font-size:16px;margin:0;font-weight:680;}
+  .chev{color:#9AA6B2;}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+  @media(max-width:900px){.cols{grid-template-columns:1fr;gap:24px;}}
+
+  .field{background:var(--input);border:1px solid var(--border);border-radius:12px;padding:11px 14px;position:relative;}
+  .field .lab{font-size:11.5px;color:var(--label);font-weight:600;margin-bottom:3px;display:flex;gap:4px;align-items:center;}
+  .field .lab .req{color:#E5484D;}
+  .field .val{font-size:14.5px;color:var(--ink);}
+  .field .val.ph{color:#9AA6B2;}
+  .field .caret{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#7A8794;font-size:11px;}
+  .field.sel{cursor:pointer;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+  .sub-h{font-size:14px;font-weight:680;margin:22px 0 12px;color:var(--ink);}
+  .linkw{position:absolute;right:14px;top:12px;color:var(--link);font-size:12.5px;font-weight:600;cursor:pointer;}
+  .voice{display:flex;align-items:center;gap:9px;font-size:14px;}
+  .voice .play{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:10px;}
+  .voice .meta{color:var(--sub);font-size:13px;}
+
+  .all6{background:#F7FaFc;border:1px solid var(--border);border-radius:14px;padding:15px 16px;}
+  .all6 .top{display:flex;align-items:flex-start;gap:10px;}
+  .all6 .top .ic{color:#5B6675;font-size:16px;margin-top:1px;}
+  .all6 .top .t1{font-weight:640;font-size:14px;}
+  .all6 .top .t2{color:var(--sub);font-size:12.5px;margin-top:2px;}
+  .all6 .change{margin-left:auto;color:var(--green);font-size:13px;font-weight:600;cursor:pointer;}
+  .all6 .recall{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:13px;color:#31415A;}
+  .all6 .recall .ok{color:var(--green);}
+
+  .prio-desc{font-size:12.5px;color:var(--sub);margin:8px 0 12px;}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{background:#fff;border:1px solid var(--border2);border-radius:9px;padding:9px 15px;font-size:13px;color:#31415A;cursor:grab;box-shadow:0 1px 1px rgba(16,24,40,.04);}
+
+  .addlab{font-size:14px;font-weight:680;margin-bottom:14px;}
+  .addgrid{display:flex;gap:12px;flex-wrap:wrap;}
+  .addbtn{background:var(--green);color:#fff;border:none;border-radius:11px;padding:12px 16px;font-family:inherit;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.08);}
+  .addbtn .cnt{opacity:.82;font-weight:500;font-size:12.5px;}
+  .addbtn .ic{font-size:15px;}
+
+  .up{position:relative;border:1.5px dashed var(--up-line);background:var(--up-bg);border-radius:14px;padding:16px 16px 15px;}
+  .up>.frtag{position:absolute;top:-10px;left:14px;background:var(--up-badge-bg);color:var(--up-badge-tx);font-family:ui-monospace,Menlo,monospace;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em;border:1px solid var(--up-line);}
+  .up .uptitle{font-size:13.5px;font-weight:700;color:#7A4F00;margin:2px 0 12px;display:flex;align-items:center;gap:7px;}
+  .up .uptitle .star{color:var(--up);}
+  .up-note{font-size:11.5px;color:#946A1A;margin-top:9px;line-height:1.4;}
+
+  .opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border2);border-radius:10px;background:#fff;cursor:pointer;font-size:13.5px;}
+  .opt.on{border-color:var(--green);background:var(--green-soft);}
+  .opt .rd{width:18px;height:18px;border-radius:50%;border:2px solid #B7C0CB;flex:none;margin-top:1px;display:grid;place-items:center;}
+  .opt.on .rd{border-color:var(--green);}
+  .opt.on .rd::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .opt .ot{font-weight:600;}
+  .opt .od{color:var(--sub);font-size:12px;font-weight:400;margin-top:2px;}
+  .optrow{display:flex;flex-direction:column;gap:9px;}
+
+  .miniinput{background:#fff;border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;}
+  .miniinput .u{color:#8A96A3;font-size:12px;}
+  .miniinput .k{font-size:11px;color:var(--label);font-weight:600;display:block;margin-bottom:2px;}
+
+  .msel{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;}
+  .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;padding:5px 9px;border-radius:7px;border:1px solid var(--border2);background:#fff;color:#41506A;cursor:pointer;user-select:none;}
+  .code.on{background:#0F1620;color:#fff;border-color:#0F1620;}
+
+  .toggle{width:38px;height:22px;border-radius:12px;background:var(--green);position:relative;flex:none;cursor:pointer;}
+  .toggle::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;right:3px;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .toggle.off{background:#C6CFD8;}
+  .toggle.off::after{right:auto;left:3px;}
+  .togrow{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;}
+
+  /* checkbox for combinable conditions */
+  .chk{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--border2);border-radius:10px;background:#fff;cursor:pointer;font-size:13.5px;margin-bottom:9px;}
+  .chk .bx{width:18px;height:18px;border-radius:5px;border:2px solid #B7C0CB;flex:none;margin-top:1px;display:grid;place-items:center;color:#fff;font-size:11px;}
+  .chk.on{border-color:var(--green);background:var(--green-soft);}
+  .chk.on .bx{background:var(--green);border-color:var(--green);}
+  .chk .ct{font-weight:600;}
+  .chk .cd{color:var(--sub);font-size:12px;font-weight:400;margin-top:1px;}
+
+  .filtbar{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:10px 14px;margin-top:16px;box-shadow:0 1px 3px rgba(16,24,40,.05);}
+  .filtbar .fb{display:flex;align-items:center;gap:6px;color:var(--sub);font-size:14px;}
+  .filtbar .clear{margin-left:auto;color:#9AA6B2;}
+  .search{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:12px 16px;margin-top:12px;color:#9AA6B2;font-size:14px;box-shadow:0 1px 3px rgba(16,24,40,.05);}
+  .thead{display:grid;grid-template-columns:36px 1.3fr 1fr 1fr .9fr 1.1fr 1.2fr 40px;gap:8px;padding:14px 18px 4px;color:#7A8794;font-size:12.5px;font-weight:600;}
+
+  .foot{display:flex;justify-content:center;gap:12px;margin-top:26px;}
+  .foot .primary{background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px 30px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 2px 6px rgba(27,168,92,.3);}
+  .foot .ghost{background:#fff;border:1px solid var(--border2);border-radius:10px;padding:12px 26px;font-size:14px;font-weight:600;font-family:inherit;color:#41506A;cursor:pointer;}
+
+  .overlay{position:fixed;inset:0;background:rgba(15,22,32,.5);z-index:60;display:none;}
+  .overlay.show{display:block;}
+  .modal{position:fixed;top:0;right:0;bottom:0;width:min(580px,95vw);background:#fff;z-index:61;transform:translateX(100%);transition:transform .28s ease;display:none;grid-template-columns:56px 1fr;overflow:hidden;}
+  .modal.show{display:grid;transform:none;}
+  @media(prefers-reduced-motion:reduce){.modal{transition:none;}}
+  .modal .rail{background:var(--rail);display:flex;justify-content:center;padding-top:22px;}
+  .modal .rail .x{width:34px;height:34px;border-radius:50%;background:#fff;color:#334155;display:grid;place-items:center;font-size:16px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .mbody{overflow-y:auto;padding:24px 26px 40px;}
+  .mbody h3{font-size:18px;margin:0 0 16px;font-weight:700;}
+  .seg{display:inline-flex;background:#EEF1F5;border-radius:10px;padding:4px;gap:4px;}
+  .seg button{border:none;background:transparent;padding:8px 16px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:#7A8794;cursor:pointer;}
+  .seg button.on{background:var(--rail);color:#fff;}
+  .mdesc{color:var(--sub);font-size:13px;margin:14px 0 18px;}
+  .mh{font-size:14px;font-weight:700;margin:20px 0 10px;}
+  .hl-g{color:var(--green);font-weight:700;} .hl-b{color:#2F80ED;font-weight:700;} .hl-o{color:var(--up);font-weight:700;}
+  .hr{height:1px;background:var(--border);margin:20px 0;}
+  .grid2m{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .radio2{display:flex;gap:22px;align-items:center;margin:6px 0 4px;}
+  .radio2 label{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;color:#41506A;}
+  .dot{width:18px;height:18px;border-radius:50%;border:2px solid #B7C0CB;display:grid;place-items:center;}
+  .dot.on{border-color:#2F80ED;} .dot.on::after{content:"";width:9px;height:9px;border-radius:50%;background:#2F80ED;}
+  .wk{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .wk span{width:38px;height:38px;border-radius:9px;border:1px solid var(--border2);display:grid;place-items:center;font-size:12.5px;font-weight:600;color:#41506A;cursor:pointer;}
+  .wk span.on{background:var(--green);color:#fff;border-color:var(--green);}
+  .timerow{display:flex;gap:10px;align-items:center;margin-top:8px;}
+  .addline{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:10px;}
+  .formula{background:#F1F7FF;border:1px solid #D6E6FB;border-radius:10px;padding:12px 14px;font-size:12.5px;color:#31415A;}
+  .formula .eq{font-family:ui-monospace,Menlo,monospace;font-size:14px;color:#2F80ED;font-weight:700;margin-bottom:8px;}
+  .formula p{margin:5px 0;color:var(--sub);}
+  .addbox{width:56px;height:56px;border:1.5px dashed #B7C0CB;border-radius:10px;display:grid;place-items:center;color:#7A8794;font-size:20px;background:#fff;cursor:pointer;margin-top:8px;}
+  .holichip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;color:#41506A;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+
+
+<div class="anno">
+  <b>Mockup nâng cấp — Tạo phiên Callbot</b>
+  <span class="fr">FR-005 · v2</span>
+  <span class="leg"><span class="swatch exist"></span> Giữ nguyên (OMICRM)</span>
+  <span class="leg"><span class="swatch up"></span> Nâng cấp theo MAFC</span>
+  <button onclick="openModal()">Xem modal · Phân bổ &amp; Gọi lại</button>
+</div>
+
+<div class="wrap">
+  <div class="phead"><div class="back">←</div><h1>Tạo phiên</h1><span class="reset">Đặt lại cấu hình</span></div>
+  <div class="pbar"></div>
+
+  <div class="panel">
+    <div class="panel-h"><h2>Cấu hình gửi</h2><span class="chev">▾</span></div>
+    <div class="cols">
+      <!-- LEFT -->
+      <div class="stack">
+        <div class="grid2">
+          <div class="field"><div class="lab">Tên phiên</div><div class="val">HappyCall_MAFC_03.08</div></div>
+          <div class="field sel"><div class="lab">Mục đích cuộc gọi</div><div class="val">Happy Call sau giải ngân</div><span class="caret">▾</span></div>
+        </div>
+        <div class="field sel"><div class="lab">Thời gian gửi</div><div class="val ph">HH:mm dd/MM/yyyy</div><span class="caret">📅</span></div>
+        <div class="field sel"><div class="lab">Đầu số <span class="req">*</span></div><div class="val">100091110</div><span class="caret">▾</span></div>
+
+        <div class="up">
+          <span class="frtag">NÂNG CẤP · FR-008</span>
+          <div class="uptitle"><span class="star">◆</span> Thời gian chờ kết nối tối đa</div>
+          <div class="miniinput"><span><span class="k">Ngắt cuộc nếu không kết nối sau</span>30</span><span class="u">giây</span></div>
+          <div class="up-note">Cho phép <b>2–30 giây</b> (min 2 · max 30). Mặc định 30 giây, MAFC điều chỉnh sau Go-live.</div>
+        </div>
+
+        <div class="sub-h">Thành phần cuộc gọi</div>
+        <div class="field sel" style="position:relative"><span class="linkw">Xem chi tiết ▾</span><div class="lab">Kịch bản AI Callbot <span class="req">*</span></div><div class="val">Kịch bản Happy Call — MAFC v1.0</div><span class="caret">▾</span></div>
+        <div class="field sel"><div class="lab">Giọng đọc</div><div class="voice"><span class="play">▶</span> <b>Khả Ngân</b> <span class="meta">Tiếng Việt, Nữ, miền Nam, 🇻🇳 Việt Nam</span></div><span class="caret">▾</span></div>
+
+        <div class="all6">
+          <div class="top"><span class="ic">☰</span><div><div class="t1">Phân bổ 10 cuộc gọi mỗi 30s</div><div class="t2">Cả ngày · Gọi lại theo điều kiện cấu hình</div></div><span class="change" onclick="openModal()">Thay đổi</span></div>
+          <div class="recall"><span class="ok">✔</span> Gọi lại theo <b>Trạng thái + Reason Code</b> · tối đa 2 lần <span style="color:var(--up);font-weight:700">●NÂNG CẤP</span></div>
+        </div>
+
+        <div class="up">
+          <span class="frtag">NÂNG CẤP · FR-005 / FR-024</span>
+          <div class="uptitle"><span class="star">◆</span> Ưu tiên chạy khi thêm data</div>
+          <div class="optrow">
+            <div class="opt on" data-grp="prio"><span class="rd"></span><div><div class="ot">Chờ hết data cũ rồi chạy <span style="color:var(--sub);font-weight:400">(mặc định)</span></div><div class="od">FIFO: data cũ chưa hoàn tất → data callback → data mới</div></div></div>
+            <div class="opt" data-grp="prio"><span class="rd"></span><div><div class="ot">Ưu tiên chạy ngay data mới</div><div class="od">Chèn data mới lên đầu hàng đợi, chạy trước</div></div></div>
+          </div>
+          <div class="miniinput" style="margin-top:11px"><span><span class="k">Số lượng data cho phép thêm mỗi lần upload</span>2000</span><span class="u">bản ghi / lần</span></div>
+          <div class="up-note">Thêm data vào <b>phiên đang chạy</b> không cần tạo phiên mới. Mỗi lần upload tối đa <b>2.000</b> bản ghi (cấu hình được).</div>
+        </div>
+
+        <div class="sub-h" style="margin-bottom:4px">Thứ tự ưu tiên giá trị biến <span style="float:right;color:var(--sub);font-weight:400;font-size:12.5px">Kéo thả để thay đổi thứ tự</span></div>
+        <div class="prio-desc">Đối với nội dung chứa biến liên kết, hệ thống ưu tiên lấy giá trị của biến theo thứ tự bên dưới. Nếu trường ưu tiên không mang giá trị, hệ thống lấy giá trị của trường ưu tiên kế tiếp.</div>
+        <div class="chips"><span class="chip">⠿ File excel</span><span class="chip">⠿ Thuộc tính khách hàng</span><span class="chip">⠿ Giá trị nhập</span></div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="addlab">Hình thức thêm khách hàng</div>
+        <div class="addgrid">
+          <button class="addbtn"><span class="ic">🗂</span> Thủ công <span class="cnt">0/2,000</span></button>
+          <button class="addbtn"><span class="ic">📊</span> File Excel <span class="cnt">0/2,000</span></button>
+          <button class="addbtn"><span class="ic">🧾</span> Thuộc tính khách hàng <span class="cnt">0/2,000</span></button>
+        </div>
+        <div class="up" style="margin-top:18px">
+          <span class="frtag">NÂNG CẤP · FR-001 / FR-003</span>
+          <div class="uptitle"><span class="star">◆</span> Nguồn nạp data tự động</div>
+          <div class="addgrid">
+            <button class="addbtn" style="background:#0F1620"><span class="ic">🔗</span> SFTP <span class="cnt">tự quét</span></button>
+            <button class="addbtn" style="background:#0F1620"><span class="ic">⚡</span> API real-time <span class="cnt">đẩy trực tiếp</span></button>
+          </div>
+          <div class="up-note">Validate 2 bước: (B1) đúng mẫu &amp; định dạng &amp; đủ <b>mandatory data</b> · (B2) AI báo lỗi chi tiết. Data SFTP sai → trả <b>file lỗi + nguyên nhân</b> về SFTP.</div>
+        </div>
+        <div style="margin-top:22px;background:#F7FAFC;border:1px solid var(--border);border-radius:14px;padding:16px;color:var(--sub);font-size:12.5px;line-height:1.5">
+          <b style="color:var(--ink)">Ghi chú:</b> khung xám = màn <i>Tạo phiên</i> OMICRM giữ nguyên. Khối <span style="color:var(--up);font-weight:700">viền vàng</span> = nâng cấp cho MAFC, gắn mã FR để truy vết. Bấm <b>"Thay đổi"</b> để xem modal Phân bổ &amp; Gọi lại (2 chế độ: Cố định / Theo thời gian thực).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filtbar"><span class="fb">▼ Hình thức ▾</span><span class="fb">Loại khách hàng ▾</span><span class="clear">⌦</span></div>
+  <div class="search">🔍 Tìm kiếm</div>
+  <div class="thead"><span>#</span><span>Tên đầy đủ</span><span>Số điện thoại</span><span>Giọng đọc</span><span>Hình thức</span><span>Tên kịch bản</span><span>Danh sách biến</span><span>▤</span></div>
+  <div class="foot"><button class="primary">Tạo phiên</button><button class="ghost">Đóng</button></div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="overlay" id="ovl" onclick="closeModal()"></div>
+<div class="modal" id="mdl">
+  <div class="rail"><div class="x" onclick="closeModal()">✕</div></div>
+  <div class="mbody">
+    <h3>Cấu hình phân bổ &amp; gọi lại</h3>
+    <div class="seg"><button id="segFixed" class="on" onclick="segTo('fixed')">Cố định</button><button id="segRT" onclick="segTo('rt')">Theo thời gian thực</button></div>
+
+    <!-- PANEL: Cố định -->
+    <div id="panelFixed">
+      <div class="mdesc">Thực hiện việc phân bổ một số lượng cụ thể của các cuộc gọi trong một khoảng thời gian cố định.</div>
+      <div class="mh">Cấu hình chi tiết</div>
+      <div class="mdesc" style="margin-top:0">Hệ thống phân bổ <span class="hl-g">10 cuộc gọi</span> mỗi <span class="hl-b">30 giây</span>.</div>
+      <div class="grid2m">
+        <div class="miniinput"><span><span class="k">Số cuộc gọi mỗi lần *</span>10</span></div>
+        <div class="miniinput"><span><span class="k">Khoảng cách gọi giữa các lần *</span>30</span><span class="u">giây</span></div>
+      </div>
+    </div>
+
+    <!-- PANEL: Theo thời gian thực (giữ nguyên UI hiện có) -->
+    <div id="panelRT" class="hidden">
+      <div class="mdesc">Hệ thống tự động tính toán theo thời gian thực với các tham số của chiến dịch để điều chỉnh số lượng cuộc gọi, đảm bảo tỷ lệ khách hàng được phục vụ tốt nhất.</div>
+      <div class="mh">Cấu hình chi tiết</div>
+      <div class="mdesc" style="margin-top:0">Hệ thống phân bố <span class="hl-g">N(t)</span> mỗi <span class="hl-b">Sa(t)</span>, gọi lại <span class="hl-o">N(t)</span> mỗi <span class="hl-b">Sa(t)</span> nếu không nghe máy.</div>
+      <div class="grid2m">
+        <div class="miniinput"><span><span class="k">Số cuộc gọi mỗi lần</span><span class="hl-g">N(t)</span></span><span class="u">Lần</span></div>
+        <div class="miniinput"><span><span class="k">Khoảng cách gọi giữa các lần</span><span class="hl-b">Sa(t)</span></span><span class="u">giây</span></div>
+      </div>
+      <div class="formula" style="margin-top:12px">
+        <div class="eq">N(t) = α × Fa(t) / Ra(t)</div>
+        <p><b>α</b>: Tỷ lệ an toàn có thể giao động từ 0.5 đến 1.5, để điều chỉnh số lượng cuộc gọi ít hơn hoặc nhiều hơn theo công thức thời gian thực.</p>
+        <p><b>Fa(t)</b>: Số lượng nhân viên đang rảnh (Free Agent) tại thời điểm t.</p>
+        <p><b>Ra(t)</b>: Tỷ lệ nghe máy (Answer Rate) được ước tính hoặc đo lường theo thời gian thực tại thời điểm t.</p>
+      </div>
+      <div class="miniinput" style="margin-top:12px"><span><span class="k">Tỷ lệ an toàn mặc định (α) *</span>1</span></div>
+      <div class="mdesc" style="margin:14px 0 6px"><span class="hl-b">Sa(t)</span> = Thời gian trung bình nghe máy trong chiến dịch (Giây)</div>
+      <div class="mh" style="font-size:13px;margin:14px 0 6px">Nhóm nội bộ</div>
+      <div class="addbox">＋</div>
+    </div>
+
+    <!-- EXISTING (không nâng cấp): Thời gian cho phép gọi -->
+    <div class="mh" style="margin-top:22px">Thời gian cho phép gọi</div>
+    <div class="radio2">
+      <label onclick="toggleHours(false)"><span class="dot on" id="dAll"></span> Cả ngày</label>
+      <label onclick="toggleHours(true)"><span class="dot" id="dHour"></span> Khung giờ</label>
+    </div>
+    <div id="hoursBlock" class="hidden">
+      <div class="timerow"><div class="miniinput" style="flex:1"><span><span class="k">Từ</span>08:00</span></div><div class="miniinput" style="flex:1"><span><span class="k">Đến</span>18:00</span></div></div>
+    </div>
+    <div class="mdesc" style="margin:8px 0 0;font-size:11.5px;color:#8A96A3">Giữ nguyên tính năng hiện có của OMICRM — không thuộc phạm vi nâng cấp.</div>
+
+    <div class="hr"></div>
+
+    <!-- SHARED UPGRADE: Recall nâng cao (kết hợp nhiều điều kiện) -->
+    <div class="up">
+      <span class="frtag">NÂNG CẤP · FR-005 / FR-025</span>
+      <div class="uptitle"><span class="star">◆</span> Cấu hình gọi lại (Recall)</div>
+      <div class="togrow" style="margin-bottom:12px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Bật cơ chế gọi lại</div>
+
+      <div style="font-size:12px;color:#946A1A;font-weight:700;margin:4px 0 9px">Điều kiện gọi lại — có thể kết hợp nhiều điều kiện</div>
+
+      <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">Đổ chuông không nghe, máy bận, thuê bao lỗi…</div></div></div>
+      <div class="msel" id="c-status"><span class="code on">RONA</span><span class="code on">NCON</span><span class="code">Máy bận</span><span class="code">Voicemail</span></div>
+
+      <div class="chk" onclick="toggleChk(this,'c-action')"><span class="bx">✓</span><div><div class="ct">Theo Action Code</div><div class="cd">[CALLBACK], [UNCOP], [OTHER]…</div></div></div>
+      <div class="msel hidden" id="c-action"><span class="code">[CALLBACK]</span><span class="code">[UNCOP]</span><span class="code">[NOTCP]</span><span class="code">[OTHER]</span></div>
+
+      <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo Reason Code</div><div class="cd">CALLBACK, LM, OTHER…</div></div></div>
+      <div class="msel" id="c-reason"><span class="code on">CALLBACK</span><span class="code on">LM</span><span class="code">OTHER</span><span class="code">UNCOP</span></div>
+
+      <div class="up-note" style="margin:10px 0 4px">KH thỏa <b>bất kỳ điều kiện nào</b> đã chọn sẽ được đưa vào danh sách recall (kết hợp OR).</div>
+
+      <div class="grid2m" style="margin-top:12px">
+        <div class="miniinput"><span><span class="k">Số lần recall tối đa *</span>2</span><span class="u">lần</span></div>
+      </div>
+
+      <div class="mh" style="margin:16px 0 8px;font-size:13px">Thời điểm thực hiện recall</div>
+      <div class="optrow">
+        <div class="opt"><span class="rd"></span><div><div class="ot">Recall sau khi đợt data hoàn thành</div><div class="od">Chờ gọi xong toàn bộ danh sách/đợt data hiện tại rồi mới thực hiện recall</div></div></div>
+        <div class="opt on"><span class="rd"></span><div style="flex:1"><div class="ot">Recall sau khoảng thời gian cấu hình</div><div class="od">Sau mỗi khoảng thời gian kể từ lần gọi trước</div>
+          <div class="miniinput" style="margin-top:8px;max-width:230px"><span><span class="k">Recall sau khoảng *</span>30</span><span class="u">phút</span></div>
+        </div></div>
+      </div>
+
+      <div class="togrow" style="margin-top:14px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Recall khi <b>đầu số bị block</b> <span style="font-weight:400;color:var(--sub);font-size:12px">(tự thay số — Spin 2)</span></div>
+      <div class="up-note" style="margin-top:12px">Ánh xạ rule kịch bản <b>R95</b>: Spin 2 cho <code>CALLBACK</code>, <code>LM</code> &amp; đầu số block; còn lại Spin 1. Cấu hình này áp cho <b>cả 2 chế độ</b> Cố định &amp; Theo thời gian thực.</div>
+    </div>
+
+    <div class="foot" style="justify-content:flex-start;margin-top:24px"><button class="primary" onclick="closeModal()">Cập nhật</button><button class="ghost" onclick="closeModal()">Đóng</button></div>
+  </div>
+</div>
+
+<script>
+  function openModal(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
+  function closeModal(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+  function segTo(mode){
+    document.getElementById('segFixed').classList.toggle('on',mode==='fixed');
+    document.getElementById('segRT').classList.toggle('on',mode==='rt');
+    document.getElementById('panelFixed').classList.toggle('hidden',mode!=='fixed');
+    document.getElementById('panelRT').classList.toggle('hidden',mode!=='rt');
+  }
+
+  document.querySelectorAll('.opt[data-grp]').forEach(o=>{
+    o.addEventListener('click',()=>{document.querySelectorAll('.opt[data-grp="'+o.dataset.grp+'"]').forEach(x=>x.classList.remove('on'));o.classList.add('on');});
+  });
+  document.querySelectorAll('.optrow').forEach(row=>{
+    row.querySelectorAll('.opt:not([data-grp])').forEach(o=>{
+      o.addEventListener('click',()=>{row.querySelectorAll('.opt:not([data-grp])').forEach(x=>x.classList.remove('on'));o.classList.add('on');});
+    });
+  });
+
+  function toggleHours(show){
+    document.getElementById('dHour').classList.toggle('on',show);
+    document.getElementById('dAll').classList.toggle('on',!show);
+    document.getElementById('hoursBlock').classList.toggle('hidden',!show);
+  }
+  let rangeN=2;
+  function addRange(){
+    rangeN++;
+    const d=document.createElement('div');d.className='timerow';
+    d.innerHTML='<div class="miniinput" style="flex:1"><span><span class="k">Khung '+rangeN+' — Từ</span>--:--</span></div><div class="miniinput" style="flex:1"><span><span class="k">Đến</span>--:--</span></div>';
+    document.getElementById('ranges').appendChild(d);
+  }
+  function addHoliday(){
+    const s=document.createElement('span');s.className='holichip';s.textContent='dd/MM · ngày lễ mới ✕';
+    document.getElementById('holidays').appendChild(s);
+  }
+  document.querySelectorAll('.wk span').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
+  document.querySelectorAll('.code').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();c.classList.toggle('on');}));
+  function toggleChk(el,target){
+    el.classList.toggle('on');
+    document.getElementById(target).classList.toggle('hidden',!el.classList.contains('on'));
+  }
+</script>
+
+</body>
+</html>
