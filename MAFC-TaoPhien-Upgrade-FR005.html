@@ -1,8 +1,3 @@
-<!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mockup nâng cấp · Tạo phiên Callbot (FR-005)</title>
 <style>
   :root{
@@ -155,9 +150,6 @@
   .holichip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;color:#41506A;}
   .hidden{display:none;}
 </style>
-</head>
-<body>
-
 
 <div class="anno">
   <b>Mockup nâng cấp — Tạo phiên Callbot</b>
@@ -188,6 +180,13 @@
           <div class="uptitle"><span class="star">◆</span> Thời gian chờ kết nối tối đa</div>
           <div class="miniinput"><span><span class="k">Ngắt cuộc nếu không kết nối sau</span>30</span><span class="u">giây</span></div>
           <div class="up-note">Cho phép <b>2–30 giây</b> (min 2 · max 30). Mặc định 30 giây, MAFC điều chỉnh sau Go-live.</div>
+        </div>
+
+        <div class="up">
+          <span class="frtag">NÂNG CẤP · MỚI</span>
+          <div class="uptitle"><span class="star">◆</span> Thời lượng đàm thoại tối đa (Max talktime)</div>
+          <div class="miniinput"><span><span class="k">Ngắt cuộc khi đàm thoại vượt quá</span>180</span><span class="u">giây</span></div>
+          <div class="up-note">Nhập thời lượng tính bằng <b>giây</b>. Tính từ thời điểm bắt máy; khi thời lượng đàm thoại chạm ngưỡng thì tự động ngắt cuộc — tránh cuộc kéo dài bất thường. <b>❓ Cần chốt:</b> min/max & mặc định.</div>
         </div>
 
         <div class="sub-h">Thành phần cuộc gọi</div>
@@ -372,6 +371,3 @@
     document.getElementById(target).classList.toggle('hidden',!el.classList.contains('on'));
   }
 </script>
-
-</body>
-</html>
