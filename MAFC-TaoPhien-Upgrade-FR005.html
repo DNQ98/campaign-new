@@ -92,14 +92,21 @@
   .msel{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;}
   .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;padding:5px 9px;border-radius:7px;border:1px solid var(--border2);background:#fff;color:#41506A;cursor:pointer;user-select:none;}
   .code.on{background:#0F1620;color:#fff;border-color:#0F1620;}
+  .code.a1{border-color:var(--ac);color:var(--ac);font-weight:700;}
+  .code.a1.on{background:var(--ac);border-color:var(--ac);color:#fff;}
   .msel2{display:flex;flex-direction:column;gap:8px;margin-top:9px;}
-  .rsg{border:1px solid var(--border2);border-radius:9px;padding:9px 10px;background:#fff;}
-  .rsg-h{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#0F1620;}
-  .rsg-h::before{content:'';width:10px;height:10px;border-radius:3px;background:var(--ac);flex:none;}
-  .rsg-h small{font-weight:500;color:var(--sub);font-size:11px;}
-  .rsg-h .lv{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--sub);background:#F1F4F8;border-radius:5px;padding:2px 6px;}
-  .rsg-c{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
-  .rsg-c .empty{font-size:11px;color:#9AA6B2;font-style:italic;}
+  .acc{border:1px solid var(--border2);border-radius:9px;background:#fff;overflow:hidden;}
+  .acc-h{display:flex;align-items:center;gap:9px;padding:10px 11px;cursor:pointer;user-select:none;font-size:12.5px;font-weight:700;color:#0F1620;}
+  .acc-dot{width:10px;height:10px;border-radius:3px;background:var(--ac);flex:none;}
+  .acc-h small{font-weight:500;color:var(--sub);font-size:11px;}
+  .acc-gbx{width:17px;height:17px;border-radius:5px;border:2px solid #B7C0CB;flex:none;display:grid;place-items:center;color:#fff;font-size:10px;line-height:1;}
+  .acc-gbx.on{background:var(--ac);border-color:var(--ac);}
+  .acc-cnt{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;color:var(--sub);background:#F1F4F8;border-radius:5px;padding:2px 6px;}
+  .acc-chev{margin-left:2px;transition:transform .18s;color:#9AA6B2;font-size:11px;}
+  .acc.open .acc-chev{transform:rotate(90deg);}
+  .acc-b{display:none;padding:0 11px 11px 36px;flex-wrap:wrap;gap:7px;}
+  .acc.open .acc-b{display:flex;}
+  .acc-b .empty{font-size:11px;color:#9AA6B2;font-style:italic;}
 
   .toggle{width:38px;height:22px;border-radius:12px;background:var(--green);position:relative;flex:none;cursor:pointer;}
   .toggle::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;right:3px;box-shadow:0 1px 2px rgba(0,0,0,.2);}
@@ -301,26 +308,31 @@
       <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">Đổ chuông không nghe, máy bận, thuê bao lỗi…</div></div></div>
       <div class="msel" id="c-status"><span class="code on">RONA</span><span class="code on">NCON</span><span class="code">Máy bận</span><span class="code">Voicemail</span></div>
 
-      <div class="chk" onclick="toggleChk(this,'c-action')"><span class="bx">✓</span><div><div class="ct">Theo Action Code</div><div class="cd">[CALLBACK], [UNCOP], [OTHER]…</div></div></div>
-      <div class="msel hidden" id="c-action"><span class="code">[CALLBACK]</span><span class="code">[UNCOP]</span><span class="code">[NOTCP]</span><span class="code">[OTHER]</span></div>
+      <div class="chk" onclick="toggleChk(this,'c-action')"><span class="bx">✓</span><div><div class="ct">Theo Action Code</div><div class="cd">Cấp 1 bộ trạng thái KH — INIT / PTP / RTP / NKP</div></div></div>
+      <div class="msel hidden" id="c-action">
+        <span class="code a1" style="--ac:#1E2A3A">INIT</span>
+        <span class="code a1" style="--ac:#2F80ED">PTP</span>
+        <span class="code a1" style="--ac:#3AAFC9">RTP</span>
+        <span class="code a1" style="--ac:#E93D82">NKP</span>
+      </div>
 
       <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo Reason Code</div><div class="cd">Multi-select 2 cấp theo bộ trạng thái KH — cấp 1 Action Code, cấp 2 Reason Code</div></div></div>
       <div class="msel2" id="c-reason">
-        <div class="rsg">
-          <div class="rsg-h" style="--ac:#1E2A3A">INIT <small>· Khởi tạo</small><span class="lv">CẤP 1</span></div>
-          <div class="rsg-c"><span class="empty">Chưa có Reason Code (trạng thái khởi tạo — chưa xử lý)</span></div>
+        <div class="acc">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#1E2A3A"></span>INIT <small>· Khởi tạo</small><span class="acc-cnt">0 reason</span><span class="acc-chev">▶</span></div>
+          <div class="acc-b"><span class="empty">Chưa có Reason Code (trạng thái khởi tạo — chưa xử lý)</span></div>
         </div>
-        <div class="rsg">
-          <div class="rsg-h" style="--ac:#2F80ED">PTP <small>· Hứa thanh toán (WIN)</small><span class="lv">CẤP 1</span></div>
-          <div class="rsg-c"><span class="code">PTP_TODAY</span><span class="code">PTP_DATE_TO_PAY</span><span class="code">PTP_NOT_DAY</span></div>
+        <div class="acc">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#2F80ED"></span>PTP <small>· Hứa thanh toán (WIN)</small><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
+          <div class="acc-b"><span class="code">PTP_TODAY</span><span class="code">PTP_DATE_TO_PAY</span><span class="code">PTP_NOT_DAY</span></div>
         </div>
-        <div class="rsg">
-          <div class="rsg-h" style="--ac:#3AAFC9">RTP <small>· Từ chối / chưa thanh toán (LOST)</small><span class="lv">CẤP 1</span></div>
-          <div class="rsg-c"><span class="code on">RTP_NO_MONEY</span><span class="code on">RTP_WAITING_SALARY</span><span class="code">RTP_OTHER</span></div>
+        <div class="acc open">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#3AAFC9"></span>RTP <small>· Từ chối / chưa TT (LOST)</small><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
+          <div class="acc-b"><span class="code on">RTP_NO_MONEY</span><span class="code on">RTP_WAITING_SALARY</span><span class="code">RTP_OTHER</span></div>
         </div>
-        <div class="rsg">
-          <div class="rsg-h" style="--ac:#E93D82">NKP <small>· Không kết nối được</small><span class="lv">CẤP 1</span></div>
-          <div class="rsg-c"><span class="code on">CAB</span><span class="code on">HUP</span></div>
+        <div class="acc open">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx on" onclick="toggleGrp(event,this)">✓</span><span class="acc-dot" style="--ac:#E93D82"></span>NKP <small>· Không kết nối được</small><span class="acc-cnt">2 reason</span><span class="acc-chev">▶</span></div>
+          <div class="acc-b"><span class="code on">CAB</span><span class="code on">HUP</span></div>
         </div>
       </div>
 
@@ -384,5 +396,14 @@
   function toggleChk(el,target){
     el.classList.toggle('on');
     document.getElementById(target).classList.toggle('hidden',!el.classList.contains('on'));
+  }
+  function toggleAcc(h){h.closest('.acc').classList.toggle('open');}
+  function toggleGrp(e,box){
+    e.stopPropagation();
+    const acc=box.closest('.acc');
+    const on=!box.classList.contains('on');
+    box.classList.toggle('on',on); box.textContent=on?'✓':'';
+    acc.querySelectorAll('.acc-b .code').forEach(c=>c.classList.toggle('on',on));
+    if(on) acc.classList.add('open');
   }
 </script>
