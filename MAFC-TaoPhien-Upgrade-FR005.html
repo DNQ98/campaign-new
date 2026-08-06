@@ -102,6 +102,12 @@
   .acc-gbx{width:17px;height:17px;border-radius:5px;border:2px solid #B7C0CB;flex:none;display:grid;place-items:center;color:#fff;font-size:10px;line-height:1;}
   .acc-gbx.on{background:var(--ac);border-color:var(--ac);}
   .acc-cnt{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;color:var(--sub);background:#F1F4F8;border-radius:5px;padding:2px 6px;}
+  .acc-lv{font-family:ui-monospace,Menlo,monospace;font-size:9px;font-weight:800;letter-spacing:.4px;border-radius:5px;padding:2px 6px;}
+  .acc-lv.l1{background:#EAF7F0;color:#1BA85C;}
+  .acc-lv.l2{background:#EAF1FF;color:#2F80ED;}
+  .acc.lv1{background:#FBFCFD;}
+  .acc.lv1 .acc-chev{display:none;}
+  .acc.lv1 .acc-b{display:flex;padding-top:2px;}
   .acc-chev{margin-left:2px;transition:transform .18s;color:#9AA6B2;font-size:11px;}
   .acc.open .acc-chev{transform:rotate(90deg);}
   .acc-b{display:none;padding:0 11px 11px 36px;flex-wrap:wrap;gap:7px;}
@@ -308,30 +314,22 @@
       <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">Đổ chuông không nghe, máy bận, thuê bao lỗi…</div></div></div>
       <div class="msel" id="c-status"><span class="code on">RONA</span><span class="code on">NCON</span><span class="code">Máy bận</span><span class="code">Voicemail</span></div>
 
-      <div class="chk" onclick="toggleChk(this,'c-action')"><span class="bx">✓</span><div><div class="ct">Theo Action Code</div><div class="cd">Cấp 1 bộ trạng thái KH — INIT / PTP / RTP / NKP</div></div></div>
-      <div class="msel hidden" id="c-action">
-        <span class="code a1" style="--ac:#1E2A3A">INIT</span>
-        <span class="code a1" style="--ac:#2F80ED">PTP</span>
-        <span class="code a1" style="--ac:#3AAFC9">RTP</span>
-        <span class="code a1" style="--ac:#E93D82">NKP</span>
-      </div>
-
-      <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo Reason Code</div><div class="cd">Multi-select 2 cấp theo bộ trạng thái KH — cấp 1 Action Code, cấp 2 Reason Code</div></div></div>
+      <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo trạng thái khách hàng</div><div class="cd">Chọn theo bộ trạng thái KH — trạng thái có thể <b>1 cấp</b> (chỉ Action Code, chọn trực tiếp) hoặc <b>2 cấp</b> (Action Code → Reason Code, xổ ra để chọn)</div></div></div>
       <div class="msel2" id="c-reason">
-        <div class="acc">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#1E2A3A"></span>INIT <small>· Khởi tạo</small><span class="acc-cnt">0 reason</span><span class="acc-chev">▶</span></div>
-          <div class="acc-b"><span class="empty">Chưa có Reason Code (trạng thái khởi tạo — chưa xử lý)</span></div>
+        <div class="acc lv1">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#1E2A3A"></span>INIT <small>· Khởi tạo</small><span class="acc-lv l1">1 CẤP</span></div>
+          <div class="acc-b"><span class="empty">Trạng thái 1 cấp — không có Reason Code; tick ô bên trái để chọn trực tiếp.</span></div>
         </div>
-        <div class="acc">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#2F80ED"></span>PTP <small>· Hứa thanh toán (WIN)</small><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
+        <div class="acc lv2">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#2F80ED"></span>PTP <small>· Hứa thanh toán (WIN)</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
           <div class="acc-b"><span class="code">PTP_TODAY</span><span class="code">PTP_DATE_TO_PAY</span><span class="code">PTP_NOT_DAY</span></div>
         </div>
-        <div class="acc open">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#3AAFC9"></span>RTP <small>· Từ chối / chưa TT (LOST)</small><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
+        <div class="acc lv2 open">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#3AAFC9"></span>RTP <small>· Từ chối / chưa TT (LOST)</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
           <div class="acc-b"><span class="code on">RTP_NO_MONEY</span><span class="code on">RTP_WAITING_SALARY</span><span class="code">RTP_OTHER</span></div>
         </div>
-        <div class="acc open">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx on" onclick="toggleGrp(event,this)">✓</span><span class="acc-dot" style="--ac:#E93D82"></span>NKP <small>· Không kết nối được</small><span class="acc-cnt">2 reason</span><span class="acc-chev">▶</span></div>
+        <div class="acc lv2 open">
+          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx on" onclick="toggleGrp(event,this)">✓</span><span class="acc-dot" style="--ac:#E93D82"></span>NKP <small>· Không kết nối được</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">2 reason</span><span class="acc-chev">▶</span></div>
           <div class="acc-b"><span class="code on">CAB</span><span class="code on">HUP</span></div>
         </div>
       </div>
