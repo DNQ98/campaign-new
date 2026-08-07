@@ -307,8 +307,21 @@
 
       <div style="font-size:12px;color:#946A1A;font-weight:700;margin:4px 0 9px">Điều kiện gọi lại — có thể kết hợp nhiều điều kiện</div>
 
-      <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">Đổ chuông không nghe, máy bận, thuê bao lỗi…</div></div></div>
-      <div class="msel" id="c-status"><span class="code on">RONA</span><span class="code on">NCON</span><span class="code">Máy bận</span><span class="code">Voicemail</span></div>
+      <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">11 trạng thái cuộc gọi (map mã Q.850/FreeSWITCH của tổng đài — Call_Status_Classification, FR-009). Hiển thị theo mô tả.</div></div></div>
+      <div class="msel" id="c-status">
+        <span class="code" title="CONNECTED · Q.850: 16, 600, 601, 605">Nghe máy</span>
+        <span class="code on" title="NO ANSWER · Q.850: 18, 19, 487, 607">Không nghe máy</span>
+        <span class="code on" title="BUSY · Q.850: 17">Bận</span>
+        <span class="code" title="VOICEMAIL · CODE OMI map theo logic voicemail">Voicemail</span>
+        <span class="code on" title="NOT AVAILABLE · Q.850: 20, 27, 606">Ngoài vùng phủ sóng</span>
+        <span class="code" title="INVALID NUMBER · Q.850: 1, 22, 28">Thuê bao không tồn tại, tạm khoá</span>
+        <span class="code" title="USER BLOCK · Q.850: 21, 54">Thuê bao chặn cuộc gọi</span>
+        <span class="code" title="DO NOT CALL · CODE OMI map theo logic Do Not Call">Chặn quảng cáo</span>
+        <span class="code" title="BLACK LIST · CODE OMI map theo logic blacklist">Danh sách cấm gọi</span>
+        <span class="code on" title="TELCO BLOCK · Q.850: 29, 34, 38, 42, 50, 52, 57, 63, 609">Nhà mạng chặn</span>
+        <span class="code on" title="GENERAL ERR · Q.850: 0, 2, 3, 6, 7, 23, 25, 30, 31, 41, 43…">Lỗi chưa xác định</span>
+      </div>
+      <div class="up-note" style="margin:8px 0 0">Gợi ý: các trạng thái <b>Nghe máy</b>, <b>Chặn quảng cáo</b>, <b>Danh sách cấm gọi</b>, <b>Thuê bao không tồn tại/tạm khoá</b> thường <b>không nên</b> bật recall. Di chuột lên từng chip để xem CODE + mã Q.850 map tương ứng.</div>
 
       <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo trạng thái khách hàng</div><div class="cd">Chọn theo bộ trạng thái KH — trạng thái có thể <b>1 cấp</b> (chỉ Action Code, chọn trực tiếp) hoặc <b>2 cấp</b> (Action Code → Reason Code, xổ ra để chọn)</div></div></div>
       <div class="msel2" id="c-reason">
