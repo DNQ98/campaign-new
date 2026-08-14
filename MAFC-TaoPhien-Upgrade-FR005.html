@@ -435,8 +435,6 @@
     {name:'Ngoài vùng phủ sóng',code:'NOT AVAILABLE',map:'Q.850: 20, 27, 606'},
     {name:'Thuê bao không tồn tại, tạm khoá',code:'INVALID NUMBER',map:'Q.850: 1, 22, 28'},
     {name:'Thuê bao chặn cuộc gọi',code:'USER BLOCK',map:'Q.850: 21, 54'},
-    {name:'Chặn quảng cáo',code:'DO NOT CALL',map:'CODE OMI map theo logic Do Not Call'},
-    {name:'Danh sách cấm gọi',code:'BLACK LIST',map:'CODE OMI map theo logic blacklist'},
     {name:'Nhà mạng chặn',code:'TELCO BLOCK',map:'Q.850: 29, 34, 38, 42, 50, 52, 57, 63, 609'},
     {name:'Lỗi chưa xác định',code:'GENERAL ERR',map:'Q.850: 0, 2, 3, 6, 7, 23, 25…'}
   ];
@@ -488,7 +486,7 @@
     hint.innerHTML=recallType==='callstate'
       ? 'Mức <b>tổng</b> của trạng thái cuộc gọi: <b>Trả lời</b> (đã kết nối) / <b>Không trả lời</b> (gộp mọi kết quả không bắt máy). KH có cuộc rơi vào trạng thái đã chọn sẽ được recall.'
       : recallType==='result'
-      ? 'Mức <b>chi tiết</b>: <b>10 kết quả cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009). KH có cuộc rơi vào <b>bất kỳ kết quả đã chọn</b> sẽ được recall (OR). Không nên chọn: Chặn quảng cáo / Danh sách cấm gọi / Thuê bao không tồn tại.'
+      ? 'Mức <b>chi tiết</b>: <b>8 kết quả cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ kết quả đã chọn</b> sẽ được recall (OR).'
       : 'Bộ <b>trạng thái khách hàng</b> (nhiều bộ · mỗi cuộc gọi cập nhật 1 bộ). Chọn trạng thái ở bất kỳ bộ nào; KH mang <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).';
   }
   function renderDD(){
