@@ -170,6 +170,38 @@
   .addbox{width:56px;height:56px;border:1.5px dashed #B7C0CB;border-radius:10px;display:grid;place-items:center;color:#7A8794;font-size:20px;background:#fff;cursor:pointer;margin-top:8px;}
   .holichip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;color:#41506A;}
   .hidden{display:none;}
+  /* ---- Recall redesign: radio + selected box + search dropdown ---- */
+  .rc-radios{display:flex;gap:30px;margin:4px 0 14px;flex-wrap:wrap;}
+  .rc-radio{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:600;color:#41506A;user-select:none;}
+  .rc-radio.on{color:#2F80ED;}
+  .rc-radio .rd{width:19px;height:19px;border-radius:50%;border:2px solid #B7C0CB;display:grid;place-items:center;flex:none;color:#fff;font-size:11px;}
+  .rc-radio.on .rd{background:#2F80ED;border-color:#2F80ED;}
+  .sel-box{background:#F4F6F9;border-radius:10px;padding:11px 13px;margin-bottom:10px;}
+  .sel-box .sb-lbl{font-size:12px;font-weight:700;color:#41506A;margin-bottom:8px;}
+  .sel-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .sel-chips .empty{font-size:12.5px;color:#9AA6B2;}
+  .sel-chip{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;}
+  .sel-chip .rm{cursor:pointer;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:10px;line-height:1;}
+  .search-dd{position:relative;}
+  .dd-input{display:flex;align-items:center;gap:9px;border:1.5px solid #2F80ED;border-radius:9px;padding:9px 13px;background:#F5FAFF;cursor:text;}
+  .dd-input input{border:none;background:transparent;outline:none;font-size:13px;font-family:inherit;color:var(--ink);flex:1;}
+  .dd-input input::placeholder{color:#8A96A3;}
+  .dd-input .ic{color:#2F80ED;font-size:14px;}
+  .dd-list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border2);border-radius:10px;box-shadow:0 10px 28px rgba(16,24,40,.14);max-height:300px;overflow-y:auto;z-index:9;padding:4px 0;}
+  .dd-list.hidden{display:none;}
+  .dd-item{padding:10px 16px;font-size:13px;color:#2B3648;cursor:pointer;}
+  .dd-item:hover{background:#F1F6FD;}
+  .dd-item.picked{color:#9AA6B2;background:#F7F9FB;}
+  .dd-item.picked::after{content:'✓ đã chọn';float:right;font-size:11px;color:var(--green);}
+  .dd-group{padding:9px 14px;font-size:12px;font-weight:800;letter-spacing:.3px;color:#41506A;display:flex;align-items:center;gap:8px;cursor:pointer;background:#FAFBFC;}
+  .dd-chev{font-size:10px;color:#9AA6B2;transition:transform .15s;width:10px;}
+  .dd-node.closed > .dd-chev{transform:rotate(-90deg);}
+  .dd-c1{padding:8px 14px 8px 30px;font-size:12.5px;font-weight:700;color:#5B6675;display:flex;align-items:center;gap:8px;cursor:pointer;}
+  .dd-c1:hover{background:#F1F6FD;}
+  .dd-leaf{padding:8px 14px 8px 50px;font-size:12.5px;color:#2B3648;cursor:pointer;}
+  .dd-leaf:hover{background:#F1F6FD;}
+  .dd-leaf.picked,.dd-c1.picked{color:#9AA6B2;}
+  .dd-children.closed{display:none;}
 </style>
 
 <div class="anno">
@@ -257,7 +289,7 @@
 <div class="modal" id="mdl">
   <div class="rail"><div class="x" onclick="closeModal()">✕</div></div>
   <div class="mbody">
-    <h3>Cấu hình phân bổ &amp; gọi lại</h3>
+    <h3>Cấu hình phân bổ cuộc gọi</h3>
     <div class="seg"><button id="segFixed" class="on" onclick="segTo('fixed')">Cố định</button><button id="segRT" onclick="segTo('rt')">Theo thời gian thực</button></div>
 
     <!-- PANEL: Cố định -->
@@ -299,53 +331,28 @@
 
     <div class="hr"></div>
 
-    <!-- SHARED UPGRADE: Recall nâng cao (kết hợp nhiều điều kiện) -->
+    <!-- SHARED UPGRADE: Recall nâng cao (chọn 1 chiều điều kiện + dropdown tìm kiếm) -->
     <div class="up">
       <span class="frtag">NÂNG CẤP · FR-005 / FR-025</span>
-      <div class="uptitle"><span class="star">◆</span> Cấu hình gọi lại (Recall)</div>
-      <div class="togrow" style="margin-bottom:12px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Bật cơ chế gọi lại</div>
+      <div class="togrow" style="margin-bottom:14px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Bật cơ chế gọi lại</div>
 
-      <div style="font-size:12px;color:#946A1A;font-weight:700;margin:4px 0 9px">Điều kiện gọi lại — có thể kết hợp nhiều điều kiện</div>
-
-      <div class="chk on" onclick="toggleChk(this,'c-status')"><span class="bx">✓</span><div><div class="ct">Theo Trạng thái cuộc gọi</div><div class="cd">11 trạng thái cuộc gọi (map mã Q.850/FreeSWITCH của tổng đài — Call_Status_Classification, FR-009). Hiển thị theo mô tả.</div></div></div>
-      <div class="msel" id="c-status">
-        <span class="code" title="CONNECTED · Q.850: 16, 600, 601, 605">Nghe máy</span>
-        <span class="code on" title="NO ANSWER · Q.850: 18, 19, 487, 607">Không nghe máy</span>
-        <span class="code on" title="BUSY · Q.850: 17">Bận</span>
-        <span class="code" title="VOICEMAIL · CODE OMI map theo logic voicemail">Voicemail</span>
-        <span class="code on" title="NOT AVAILABLE · Q.850: 20, 27, 606">Ngoài vùng phủ sóng</span>
-        <span class="code" title="INVALID NUMBER · Q.850: 1, 22, 28">Thuê bao không tồn tại, tạm khoá</span>
-        <span class="code" title="USER BLOCK · Q.850: 21, 54">Thuê bao chặn cuộc gọi</span>
-        <span class="code" title="DO NOT CALL · CODE OMI map theo logic Do Not Call">Chặn quảng cáo</span>
-        <span class="code" title="BLACK LIST · CODE OMI map theo logic blacklist">Danh sách cấm gọi</span>
-        <span class="code on" title="TELCO BLOCK · Q.850: 29, 34, 38, 42, 50, 52, 57, 63, 609">Nhà mạng chặn</span>
-        <span class="code on" title="GENERAL ERR · Q.850: 0, 2, 3, 6, 7, 23, 25, 30, 31, 41, 43…">Lỗi chưa xác định</span>
-      </div>
-      <div class="up-note" style="margin:8px 0 0">Gợi ý: các trạng thái <b>Nghe máy</b>, <b>Chặn quảng cáo</b>, <b>Danh sách cấm gọi</b>, <b>Thuê bao không tồn tại/tạm khoá</b> thường <b>không nên</b> bật recall. Di chuột lên từng chip để xem CODE + mã Q.850 map tương ứng.</div>
-
-      <div class="chk on" onclick="toggleChk(this,'c-reason')"><span class="bx">✓</span><div><div class="ct">Theo trạng thái khách hàng</div><div class="cd">Chọn theo bộ trạng thái KH — trạng thái có thể <b>1 cấp</b> (chỉ Action Code, chọn trực tiếp) hoặc <b>2 cấp</b> (Action Code → Reason Code, xổ ra để chọn)</div></div></div>
-      <div class="msel2" id="c-reason">
-        <div class="acc lv1">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#1E2A3A"></span>INIT <small>· Khởi tạo</small><span class="acc-lv l1">1 CẤP</span></div>
-          <div class="acc-b"><span class="empty">Trạng thái 1 cấp — không có Reason Code; tick ô bên trái để chọn trực tiếp.</span></div>
-        </div>
-        <div class="acc lv2">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#2F80ED"></span>PTP <small>· Hứa thanh toán (WIN)</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
-          <div class="acc-b"><span class="code">PTP_TODAY</span><span class="code">PTP_DATE_TO_PAY</span><span class="code">PTP_NOT_DAY</span></div>
-        </div>
-        <div class="acc lv2 open">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx" onclick="toggleGrp(event,this)"></span><span class="acc-dot" style="--ac:#3AAFC9"></span>RTP <small>· Từ chối / chưa TT (LOST)</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">3 reason</span><span class="acc-chev">▶</span></div>
-          <div class="acc-b"><span class="code on">RTP_NO_MONEY</span><span class="code on">RTP_WAITING_SALARY</span><span class="code">RTP_OTHER</span></div>
-        </div>
-        <div class="acc lv2 open">
-          <div class="acc-h" onclick="toggleAcc(this)"><span class="acc-gbx on" onclick="toggleGrp(event,this)">✓</span><span class="acc-dot" style="--ac:#E93D82"></span>NKP <small>· Không kết nối được</small><span class="acc-lv l2">2 CẤP</span><span class="acc-cnt">2 reason</span><span class="acc-chev">▶</span></div>
-          <div class="acc-b"><span class="code on">CAB</span><span class="code on">HUP</span></div>
-        </div>
+      <div class="rc-radios">
+        <label class="rc-radio on" data-rt="status" onclick="setRecallType('status')"><span class="rd">✓</span> Theo Trạng thái cuộc gọi</label>
+        <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo trạng thái khách hàng</label>
       </div>
 
-      <div class="up-note" style="margin:10px 0 4px">KH thỏa <b>bất kỳ điều kiện nào</b> đã chọn sẽ được đưa vào danh sách recall (kết hợp OR).</div>
+      <div class="sel-box">
+        <div class="sb-lbl">Trạng thái</div>
+        <div class="sel-chips" id="selChips"></div>
+      </div>
 
-      <div class="grid2m" style="margin-top:12px">
+      <div class="search-dd">
+        <div class="dd-input" onclick="openDD(event)"><span class="ic">🔍</span><input id="ddSearch" placeholder="Tìm kiếm" oninput="renderDD()" onfocus="openDD(event)"></div>
+        <div class="dd-list hidden" id="ddList"></div>
+      </div>
+      <div class="up-note" style="margin:8px 0 0" id="rcHint"></div>
+
+      <div class="grid2m" style="margin-top:14px">
         <div class="miniinput"><span><span class="k">Số lần recall tối đa *</span>2</span><span class="u">lần</span></div>
         <div class="miniinput"><span><span class="k">Recall sau khoảng *</span>30</span><span class="u">phút</span></div>
       </div>
@@ -413,4 +420,108 @@
     acc.querySelectorAll('.acc-b .code').forEach(c=>c.classList.toggle('on',on));
     if(on) acc.classList.add('open');
   }
+
+  // ===== Recall redesign: chọn 1 chiều (radio) + dropdown tìm kiếm =====
+  const CALLSTATUS=[
+    {name:'Không nghe máy',code:'NO ANSWER',map:'Q.850: 18, 19, 487, 607'},
+    {name:'Bận',code:'BUSY',map:'Q.850: 17'},
+    {name:'Voicemail',code:'VOICEMAIL',map:'CODE OMI map theo logic voicemail'},
+    {name:'Ngoài vùng phủ sóng',code:'NOT AVAILABLE',map:'Q.850: 20, 27, 606'},
+    {name:'Thuê bao không tồn tại, tạm khoá',code:'INVALID NUMBER',map:'Q.850: 1, 22, 28'},
+    {name:'Thuê bao chặn cuộc gọi',code:'USER BLOCK',map:'Q.850: 21, 54'},
+    {name:'Chặn quảng cáo',code:'DO NOT CALL',map:'CODE OMI map theo logic Do Not Call'},
+    {name:'Danh sách cấm gọi',code:'BLACK LIST',map:'CODE OMI map theo logic blacklist'},
+    {name:'Nhà mạng chặn',code:'TELCO BLOCK',map:'Q.850: 29, 34, 38, 42, 50, 52, 57, 63, 609'},
+    {name:'Lỗi chưa xác định',code:'GENERAL ERR',map:'Q.850: 0, 2, 3, 6, 7, 23, 25…'}
+  ];
+  const CUSTTREE=[
+    {dim:'ACTION CODE',groups:[
+      {c1:'INIT',leaves:['INIT']},
+      {c1:'PTP',leaves:['PTP_TODAY','PTP_DATE_TO_PAY','PTP_NOT_DAY']},
+      {c1:'RTP',leaves:['RTP_NO_MONEY','RTP_WAITING_SALARY','RTP_OTHER']},
+      {c1:'NKP',leaves:['CAB','HUP']},
+      {c1:'NCM',leaves:['NCM']},{c1:'PAID',leaves:['PAID']},{c1:'FRAUD',leaves:['FRAUD']},{c1:'SPT',leaves:['SPT']}
+    ]},
+    {dim:'CONTACT STATUS',groups:[
+      {c1:'NOT_STARTED',leaves:['NOT_STARTED']},{c1:'ANSWER',leaves:['ANSWER']},{c1:'HANG UP',leaves:['HANG UP']},
+      {c1:'VOICEMAIL',leaves:['VOICEMAIL']},{c1:'BUSY',leaves:['BUSY']},{c1:'NO ANSWER',leaves:['NO ANSWER']},
+      {c1:'NOT AVAILABLE',leaves:['NOT AVAILABLE']},{c1:'INVALID NUMBER',leaves:['INVALID NUMBER']},{c1:'UNKNOW',leaves:['UNKNOW']}
+    ]},
+    {dim:'ZALO FRIEND',groups:[{c1:'FRIEND_ACCEPTED',leaves:['FRIEND_ACCEPTED']},{c1:'FRIEND_REQUEST_FAILED',leaves:['FRIEND_REQUEST_FAILED']},{c1:'NOT_FRIEND',leaves:['NOT_FRIEND']}]},
+    {dim:'ZALO MESSAGE',groups:[{c1:'MESSAGE_SEND_SUCCESS',leaves:['MESSAGE_SEND_SUCCESS']},{c1:'MESSAGE_SEND_FAILED',leaves:['MESSAGE_SEND_FAILED']}]}
+  ];
+  let recallType='status';
+  let selStatus=new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']);
+  let selCust=new Set(['RTP_NO_MONEY','CAB']);
+  const openDims=new Set(['ACTION CODE']);
+  const openC1=new Set();
+  function escQ(s){return (''+s).replace(/'/g,"\\'");}
+  function custLeafCount(){let n=0;CUSTTREE.forEach(d=>d.groups.forEach(g=>n+=g.leaves.length));return n;}
+  function curSel(){return recallType==='status'?selStatus:selCust;}
+  function setRecallType(t){
+    recallType=t;
+    document.querySelectorAll('.rc-radio').forEach(r=>r.classList.toggle('on',r.dataset.rt===t));
+    document.getElementById('ddSearch').value='';
+    renderChips();renderDD();
+  }
+  function openDD(e){e&&e.stopPropagation();document.getElementById('ddList').classList.remove('hidden');renderDD();}
+  function closeDD(){document.getElementById('ddList').classList.add('hidden');}
+  function rmChip(v){curSel().delete(v);renderChips();renderDD();}
+  function pick(v){curSel().add(v);renderChips();renderDD();document.getElementById('ddSearch').focus();}
+  function renderChips(){
+    const sel=curSel(),box=document.getElementById('selChips');
+    box.innerHTML=sel.size===0?'<span class="empty">Chưa có dữ liệu</span>'
+      :[...sel].map(v=>`<span class="sel-chip">${v}<span class="rm" onclick="rmChip('${escQ(v)}')">✕</span></span>`).join('');
+    const hint=document.getElementById('rcHint');
+    hint.innerHTML=recallType==='status'
+      ? 'Bộ <b>trạng thái cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009). KH có cuộc rơi vào <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR). Không nên chọn: Chặn quảng cáo / Danh sách cấm gọi / Thuê bao không tồn tại.'
+      : 'Bộ <b>trạng thái khách hàng</b> (nhiều bộ · mỗi cuộc gọi cập nhật 1 bộ). Chọn trạng thái ở bất kỳ bộ nào; KH mang <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).';
+  }
+  function renderDD(){
+    const list=document.getElementById('ddList');
+    const q=(document.getElementById('ddSearch').value||'').trim().toLowerCase();
+    if(recallType==='status'){
+      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+CALLSTATUS.length+' trạng thái';
+      const rows=CALLSTATUS.filter(s=>s.name.toLowerCase().includes(q)||s.code.toLowerCase().includes(q));
+      list.innerHTML=rows.map(s=>{const p=selStatus.has(s.name);
+        return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name}</div>`;
+      }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
+    }else{
+      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+custLeafCount()+' trạng thái';
+      if(q){
+        let rows=[];
+        CUSTTREE.forEach(d=>d.groups.forEach(g=>g.leaves.forEach(lf=>{
+          if(lf.toLowerCase().includes(q)||d.dim.toLowerCase().includes(q)||g.c1.toLowerCase().includes(q)) rows.push({dim:d.dim,leaf:lf});
+        })));
+        list.innerHTML=rows.map(r=>{const p=selCust.has(r.leaf);
+          return `<div class="dd-leaf ${p?'picked':''}" style="padding-left:16px" ${p?'':`onclick="pick('${escQ(r.leaf)}')"`}><span style="color:#9AA6B2;font-size:11px">${r.dim} · </span>${r.leaf}</div>`;
+        }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
+      }else{
+        let html='';
+        CUSTTREE.forEach(d=>{
+          const dOpen=openDims.has(d.dim);
+          html+=`<div class="dd-group dd-node ${dOpen?'':'closed'}" onclick="toggleDim('${escQ(d.dim)}')"><span class="dd-chev">▼</span>${d.dim}</div>`;
+          html+=`<div class="dd-children ${dOpen?'':'closed'}">`;
+          d.groups.forEach(g=>{
+            const key=d.dim+'/'+g.c1, c1Open=openC1.has(key), single=g.leaves.length===1&&g.leaves[0]===g.c1;
+            if(single){const p=selCust.has(g.c1);
+              html+=`<div class="dd-c1 ${p?'picked':''}" ${p?'':`onclick="pick('${escQ(g.c1)}')"`}><span style="width:10px;display:inline-block"></span>${g.c1}</div>`;
+            }else{
+              html+=`<div class="dd-c1 dd-node ${c1Open?'':'closed'}" onclick="toggleC1('${escQ(key)}')"><span class="dd-chev">▼</span>${g.c1}</div>`;
+              html+=`<div class="dd-children ${c1Open?'':'closed'}">`;
+              g.leaves.forEach(lf=>{const p=selCust.has(lf);
+                html+=`<div class="dd-leaf ${p?'picked':''}" ${p?'':`onclick="pick('${escQ(lf)}')"`}>${lf}</div>`;});
+              html+=`</div>`;
+            }
+          });
+          html+=`</div>`;
+        });
+        list.innerHTML=html;
+      }
+    }
+  }
+  function toggleDim(d){openDims.has(d)?openDims.delete(d):openDims.add(d);renderDD();}
+  function toggleC1(k){openC1.has(k)?openC1.delete(k):openC1.add(k);renderDD();}
+  document.addEventListener('click',e=>{if(!e.target.closest('.search-dd'))closeDD();});
+  renderChips();renderDD();
 </script>
