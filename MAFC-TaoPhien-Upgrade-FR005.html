@@ -205,6 +205,15 @@
   .subtabs2{display:inline-flex;background:#EEF2F7;border-radius:8px;padding:3px;margin:0 0 10px;gap:2px;}
   .subtabs2 button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:#5B6675;padding:6px 15px;border-radius:6px;cursor:pointer;}
   .subtabs2 button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,40,.1);}
+  .tcards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+  @media(max-width:560px){.tcards{grid-template-columns:1fr;}}
+  .tcard{border:1px solid #E1E7EF;border-radius:12px;padding:12px 15px;background:#F5F7FB;}
+  .tc-lbl{font-size:12.5px;color:#41506A;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px;}
+  .tc-q{color:#9AA6B2;font-size:12px;cursor:help;font-weight:400;}
+  .tc-row{display:flex;align-items:baseline;gap:8px;}
+  .tc-in{flex:1;border:none;outline:none;font-size:17px;font-weight:700;color:var(--ink);font-family:inherit;background:transparent;min-width:0;}
+  .tc-in::placeholder{color:#9AA6B2;font-weight:400;font-size:14px;}
+  .tc-u{color:#8A96A3;font-size:13px;flex:none;}
 </style>
 
 <div class="anno">
@@ -233,16 +242,16 @@
 
         <div class="up">
           <span class="frtag">NÂNG CẤP · FR-008</span>
-          <div class="uptitle"><span class="star">◆</span> Thời gian chờ kết nối tối đa</div>
-          <div class="miniinput"><span><span class="k">Ngắt cuộc nếu không kết nối sau</span>30</span><span class="u">giây</span></div>
-          <div class="up-note">Cho phép <b>2–30 giây</b> (min 2 · max 30). Mặc định 30 giây, MAFC điều chỉnh sau Go-live.</div>
-        </div>
-
-        <div class="up">
-          <span class="frtag">NÂNG CẤP · MỚI</span>
-          <div class="uptitle"><span class="star">◆</span> Thời lượng đàm thoại tối đa (Max talktime)</div>
-          <div class="miniinput"><span><span class="k">Ngắt cuộc khi đàm thoại vượt quá</span>180</span><span class="u">giây</span></div>
-          <div class="up-note">Nhập thời lượng tính bằng <b>giây</b>. Tính từ thời điểm bắt máy; khi thời lượng đàm thoại chạm ngưỡng thì tự động ngắt cuộc — tránh cuộc kéo dài bất thường. <b>❓ Cần chốt:</b> min/max & mặc định.</div>
+          <div class="tcards">
+            <div class="tcard">
+              <div class="tc-lbl">Thời gian chờ kết nối tối đa <span class="tc-q" title="Ngắt cuộc nếu không kết nối sau N giây. Cho phép 2–30s, mặc định 30 (MAFC điều chỉnh sau Go-live).">(?)</span></div>
+              <div class="tc-row"><input class="tc-in" value="30"><span class="tc-u">giây</span></div>
+            </div>
+            <div class="tcard">
+              <div class="tc-lbl">Thời lượng đàm thoại tối đa <span class="tc-q" title="Ngắt cuộc khi thời lượng đàm thoại vượt ngưỡng. Tính từ thời điểm bắt máy — tránh cuộc kéo dài bất thường. ❓ min/max & mặc định cần chốt.">(?)</span></div>
+              <div class="tc-row"><input class="tc-in" placeholder="Tối đa 12 ký tự"><span class="tc-u">giây</span></div>
+            </div>
+          </div>
         </div>
 
         <div class="sub-h">Thành phần cuộc gọi</div>
