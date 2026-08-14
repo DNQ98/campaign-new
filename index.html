@@ -171,7 +171,7 @@
   .holichip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;color:#41506A;}
   .hidden{display:none;}
   /* ---- Recall redesign: radio + selected box + search dropdown ---- */
-  .rc-radios{display:flex;gap:30px;margin:4px 0 14px;flex-wrap:wrap;}
+  .rc-radios{display:flex;flex-direction:column;gap:12px;margin:4px 0 14px;}
   .rc-radio{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:600;color:#41506A;user-select:none;}
   .rc-radio.on{color:#2F80ED;}
   .rc-radio .rd{width:19px;height:19px;border-radius:50%;border:2px solid #B7C0CB;display:grid;place-items:center;flex:none;color:#fff;font-size:11px;}
@@ -202,6 +202,9 @@
   .dd-leaf:hover{background:#F1F6FD;}
   .dd-leaf.picked,.dd-c1.picked{color:#9AA6B2;}
   .dd-children.closed{display:none;}
+  .subtabs2{display:inline-flex;background:#EEF2F7;border-radius:8px;padding:3px;margin:0 0 10px;gap:2px;}
+  .subtabs2 button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:#5B6675;padding:6px 15px;border-radius:6px;cursor:pointer;}
+  .subtabs2 button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,40,.1);}
 </style>
 
 <div class="anno">
@@ -337,7 +340,8 @@
       <div class="togrow" style="margin-bottom:14px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Bật cơ chế gọi lại</div>
 
       <div class="rc-radios">
-        <label class="rc-radio on" data-rt="status" onclick="setRecallType('status')"><span class="rd">✓</span> Theo Trạng thái cuộc gọi</label>
+        <label class="rc-radio" data-rt="callstate" onclick="setRecallType('callstate')"><span class="rd">✓</span> Theo trạng thái cuộc gọi</label>
+        <label class="rc-radio on" data-rt="result" onclick="setRecallType('result')"><span class="rd">✓</span> Theo kết quả cuộc gọi</label>
         <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo trạng thái khách hàng</label>
       </div>
 
@@ -450,14 +454,19 @@
     {dim:'ZALO FRIEND',groups:[{c1:'FRIEND_ACCEPTED',leaves:['FRIEND_ACCEPTED']},{c1:'FRIEND_REQUEST_FAILED',leaves:['FRIEND_REQUEST_FAILED']},{c1:'NOT_FRIEND',leaves:['NOT_FRIEND']}]},
     {dim:'ZALO MESSAGE',groups:[{c1:'MESSAGE_SEND_SUCCESS',leaves:['MESSAGE_SEND_SUCCESS']},{c1:'MESSAGE_SEND_FAILED',leaves:['MESSAGE_SEND_FAILED']}]}
   ];
-  let recallType='status';
-  let selStatus=new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']);
+  const STATUS_CALLSTATE=[
+    {name:'Trả lời',code:'CONNECTED',map:'Cuộc gọi được bắt máy (Q.850: 16, 600, 601, 605)'},
+    {name:'Không trả lời',code:'NOT ANSWERED',map:'Mọi trường hợp KH không bắt máy (gộp các Kết quả cuộc gọi ≠ Trả lời)'}
+  ];
+  let recallType='result';
+  let selCallstate=new Set(['Không trả lời']);
+  let selResult=new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']);
   let selCust=new Set(['RTP_NO_MONEY','CAB']);
   const openDims=new Set(['ACTION CODE']);
   const openC1=new Set();
   function escQ(s){return (''+s).replace(/'/g,"\\'");}
   function custLeafCount(){let n=0;CUSTTREE.forEach(d=>d.groups.forEach(g=>n+=g.leaves.length));return n;}
-  function curSel(){return recallType==='status'?selStatus:selCust;}
+  function curSel(){ return recallType==='callstate'?selCallstate:recallType==='result'?selResult:selCust; }
   function setRecallType(t){
     recallType=t;
     document.querySelectorAll('.rc-radio').forEach(r=>r.classList.toggle('on',r.dataset.rt===t));
@@ -466,24 +475,29 @@
   }
   function openDD(e){e&&e.stopPropagation();document.getElementById('ddList').classList.remove('hidden');renderDD();}
   function closeDD(){document.getElementById('ddList').classList.add('hidden');}
-  function rmChip(v){curSel().delete(v);renderChips();renderDD();}
+  function rmChip(v){selCallstate.delete(v);selResult.delete(v);selCust.delete(v);renderChips();renderDD();}
   function pick(v){curSel().add(v);renderChips();renderDD();document.getElementById('ddSearch').focus();}
   function renderChips(){
-    const sel=curSel(),box=document.getElementById('selChips');
-    box.innerHTML=sel.size===0?'<span class="empty">Chưa có dữ liệu</span>'
-      :[...sel].map(v=>`<span class="sel-chip">${v}<span class="rm" onclick="rmChip('${escQ(v)}')">✕</span></span>`).join('');
+    const box=document.getElementById('selChips');
+    const items=[...curSel()];
+    box.innerHTML=items.length===0?'<span class="empty">Chưa có dữ liệu</span>'
+      :items.map(v=>`<span class="sel-chip">${v}<span class="rm" onclick="rmChip('${escQ(v)}')">✕</span></span>`).join('');
     const hint=document.getElementById('rcHint');
-    hint.innerHTML=recallType==='status'
-      ? 'Bộ <b>trạng thái cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009). KH có cuộc rơi vào <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR). Không nên chọn: Chặn quảng cáo / Danh sách cấm gọi / Thuê bao không tồn tại.'
+    hint.innerHTML=recallType==='callstate'
+      ? 'Mức <b>tổng</b> của trạng thái cuộc gọi: <b>Trả lời</b> (đã kết nối) / <b>Không trả lời</b> (gộp mọi kết quả không bắt máy). KH có cuộc rơi vào trạng thái đã chọn sẽ được recall.'
+      : recallType==='result'
+      ? 'Mức <b>chi tiết</b>: <b>10 kết quả cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009). KH có cuộc rơi vào <b>bất kỳ kết quả đã chọn</b> sẽ được recall (OR). Không nên chọn: Chặn quảng cáo / Danh sách cấm gọi / Thuê bao không tồn tại.'
       : 'Bộ <b>trạng thái khách hàng</b> (nhiều bộ · mỗi cuộc gọi cập nhật 1 bộ). Chọn trạng thái ở bất kỳ bộ nào; KH mang <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).';
   }
   function renderDD(){
     const list=document.getElementById('ddList');
     const q=(document.getElementById('ddSearch').value||'').trim().toLowerCase();
-    if(recallType==='status'){
-      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+CALLSTATUS.length+' trạng thái';
-      const rows=CALLSTATUS.filter(s=>s.name.toLowerCase().includes(q)||s.code.toLowerCase().includes(q));
-      list.innerHTML=rows.map(s=>{const p=selStatus.has(s.name);
+    if(recallType==='callstate'||recallType==='result'){
+      const src=recallType==='callstate'?STATUS_CALLSTATE:CALLSTATUS;
+      const selSet=curSel();
+      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+src.length+' trạng thái';
+      const rows=src.filter(s=>s.name.toLowerCase().includes(q)||s.code.toLowerCase().includes(q));
+      list.innerHTML=rows.map(s=>{const p=selSet.has(s.name);
         return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name}</div>`;
       }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }else{
