@@ -343,7 +343,7 @@
 
       <div class="rc-radios">
         <label class="rc-radio" data-rt="callstate" onclick="setRecallType('callstate')"><span class="rd">✓</span> Theo trạng thái cuộc gọi</label>
-        <label class="rc-radio on" data-rt="result" onclick="setRecallType('result')"><span class="rd">✓</span> Theo kết quả cuộc gọi</label>
+        <label class="rc-radio on" data-rt="result" onclick="setRecallType('result')"><span class="rd">✓</span> Theo lý do không trả lời</label>
         <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo trạng thái khách hàng</label>
       </div>
 
@@ -486,7 +486,7 @@
     hint.innerHTML=recallType==='callstate'
       ? 'Mức <b>tổng</b> của trạng thái cuộc gọi: <b>Trả lời</b> (đã kết nối) / <b>Không trả lời</b> (gộp mọi kết quả không bắt máy). KH có cuộc rơi vào trạng thái đã chọn sẽ được recall.'
       : recallType==='result'
-      ? 'Mức <b>chi tiết</b>: <b>8 kết quả cuộc gọi</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ kết quả đã chọn</b> sẽ được recall (OR).'
+      ? '<b>Chi tiết lý do không trả lời</b>: <b>8 mã</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ lý do đã chọn</b> sẽ được recall (OR).'
       : 'Bộ <b>trạng thái khách hàng</b> (nhiều bộ · mỗi cuộc gọi cập nhật 1 bộ). Chọn trạng thái ở bất kỳ bộ nào; KH mang <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).';
   }
   function renderDD(){
