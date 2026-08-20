@@ -344,7 +344,7 @@
       <div class="rc-radios">
         <label class="rc-radio" data-rt="callstate" onclick="setRecallType('callstate')"><span class="rd">✓</span> Theo trạng thái cuộc gọi</label>
         <label class="rc-radio on" data-rt="result" onclick="setRecallType('result')"><span class="rd">✓</span> Theo lý do không trả lời</label>
-        <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo trạng thái khách hàng</label>
+        <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo Phân loại (kịch bản)</label>
       </div>
 
       <div class="sel-box">
@@ -458,10 +458,22 @@
     {name:'Trả lời',code:'CONNECTED',map:'Cuộc gọi được bắt máy (Q.850: 16, 600, 601, 605)'},
     {name:'Không trả lời',code:'NOT ANSWERED',map:'Mọi trường hợp KH không bắt máy (gộp các Kết quả cuộc gọi ≠ Trả lời)'}
   ];
+  // Phân loại (1 cấp) khai báo trong kịch bản — điều kiện recall theo PHÂN LOẠI CUỐI CÙNG của cuộc gọi. Giá trị minh hoạ (danh mục thật do kịch bản khai báo).
+  const PHANLOAI=[
+    {name:'PTP_TODAY',desc:'Hứa thanh toán trong hôm nay'},
+    {name:'PTP_DATE_TO_PAY',desc:'Hứa thanh toán vào ngày cụ thể'},
+    {name:'PTP_NOT_DAY',desc:'Hứa thanh toán nhưng chưa rõ ngày'},
+    {name:'RTP_NO_MONEY',desc:'Từ chối/chưa trả — chưa có tiền'},
+    {name:'RTP_WAITING_SALARY',desc:'Chờ lương'},
+    {name:'RTP_OTHER',desc:'Từ chối / lý do khác'},
+    {name:'CAB',desc:'Hẹn gọi lại (callback)'},
+    {name:'HUP',desc:'KH dập máy giữa chừng'},
+    {name:'INIT',desc:'Chưa có kết quả phân loại'}
+  ];
   let recallType='result';
   let selCallstate=new Set(['Không trả lời']);
   let selResult=new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']);
-  let selCust=new Set(['RTP_NO_MONEY','CAB']);
+  let selCust=new Set(['CAB','RTP_NO_MONEY']);
   const openDims=new Set(['ACTION CODE']);
   const openC1=new Set();
   function escQ(s){return (''+s).replace(/'/g,"\\'");}
@@ -487,7 +499,7 @@
       ? 'Mức <b>tổng</b> của trạng thái cuộc gọi: <b>Trả lời</b> (đã kết nối) / <b>Không trả lời</b> (gộp mọi kết quả không bắt máy). KH có cuộc rơi vào trạng thái đã chọn sẽ được recall.'
       : recallType==='result'
       ? '<b>Chi tiết lý do không trả lời</b>: <b>8 mã</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ lý do đã chọn</b> sẽ được recall (OR).'
-      : 'Bộ <b>trạng thái khách hàng</b> (nhiều bộ · mỗi cuộc gọi cập nhật 1 bộ). Chọn trạng thái ở bất kỳ bộ nào; KH mang <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).';
+      : '<b>Phân loại (1 cấp, khai báo trong kịch bản)</b>. Lấy theo <b>phân loại CUỐI CÙNG</b> mà cuộc gọi đi qua trong flow; cuộc có phân loại cuối ∈ các mã đã chọn sẽ được recall (OR). <i>Danh mục thật do kịch bản khai báo (giá trị minh hoạ).</i>';
   }
   function renderDD(){
     const list=document.getElementById('ddList');
@@ -501,37 +513,12 @@
         return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name}</div>`;
       }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }else{
-      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+custLeafCount()+' trạng thái';
-      if(q){
-        let rows=[];
-        CUSTTREE.forEach(d=>d.groups.forEach(g=>g.leaves.forEach(lf=>{
-          if(lf.toLowerCase().includes(q)||d.dim.toLowerCase().includes(q)||g.c1.toLowerCase().includes(q)) rows.push({dim:d.dim,leaf:lf});
-        })));
-        list.innerHTML=rows.map(r=>{const p=selCust.has(r.leaf);
-          return `<div class="dd-leaf ${p?'picked':''}" style="padding-left:16px" ${p?'':`onclick="pick('${escQ(r.leaf)}')"`}><span style="color:#9AA6B2;font-size:11px">${r.dim} · </span>${r.leaf}</div>`;
-        }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
-      }else{
-        let html='';
-        CUSTTREE.forEach(d=>{
-          const dOpen=openDims.has(d.dim);
-          html+=`<div class="dd-group dd-node ${dOpen?'':'closed'}" onclick="toggleDim('${escQ(d.dim)}')"><span class="dd-chev">▼</span>${d.dim}</div>`;
-          html+=`<div class="dd-children ${dOpen?'':'closed'}">`;
-          d.groups.forEach(g=>{
-            const key=d.dim+'/'+g.c1, c1Open=openC1.has(key), single=g.leaves.length===1&&g.leaves[0]===g.c1;
-            if(single){const p=selCust.has(g.c1);
-              html+=`<div class="dd-c1 ${p?'picked':''}" ${p?'':`onclick="pick('${escQ(g.c1)}')"`}><span style="width:10px;display:inline-block"></span>${g.c1}</div>`;
-            }else{
-              html+=`<div class="dd-c1 dd-node ${c1Open?'':'closed'}" onclick="toggleC1('${escQ(key)}')"><span class="dd-chev">▼</span>${g.c1}</div>`;
-              html+=`<div class="dd-children ${c1Open?'':'closed'}">`;
-              g.leaves.forEach(lf=>{const p=selCust.has(lf);
-                html+=`<div class="dd-leaf ${p?'picked':''}" ${p?'':`onclick="pick('${escQ(lf)}')"`}>${lf}</div>`;});
-              html+=`</div>`;
-            }
-          });
-          html+=`</div>`;
-        });
-        list.innerHTML=html;
-      }
+      // Theo Phân loại — list phẳng 1 cấp (khai báo trong kịch bản)
+      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+PHANLOAI.length+' phân loại';
+      const rows=PHANLOAI.filter(s=>s.name.toLowerCase().includes(q)||s.desc.toLowerCase().includes(q));
+      list.innerHTML=rows.map(s=>{const p=selCust.has(s.name);
+        return `<div class="dd-item ${p?'picked':''}" title="${s.desc}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name} <span style="color:#9AA6B2;font-size:11px">· ${s.desc}</span></div>`;
+      }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }
   }
   function toggleDim(d){openDims.has(d)?openDims.delete(d):openDims.add(d);renderDD();}
