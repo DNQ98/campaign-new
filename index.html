@@ -277,7 +277,7 @@
           <button class="addbtn"><span class="ic">🧾</span> Thuộc tính khách hàng <span class="cnt">0/2,000</span></button>
         </div>
         <div style="margin-top:22px;background:#F7FAFC;border:1px solid var(--border);border-radius:14px;padding:16px;color:var(--sub);font-size:12.5px;line-height:1.5">
-          <b style="color:var(--ink)">Ghi chú:</b> khung xám = màn <i>Tạo phiên</i> OMICRM giữ nguyên. Khối <span style="color:var(--up);font-weight:700">viền vàng</span> = nâng cấp cho MAFC, gắn mã FR để truy vết. Bấm <b>"Thay đổi"</b> để xem modal Phân bổ &amp; Gọi lại (2 chế độ: Cố định / Theo thời gian thực).
+          <b style="color:var(--ink)">Ghi chú:</b> khung xám = màn <i>Tạo phiên</i> OMICRM giữ nguyên. Khối <span style="color:var(--up);font-weight:700">viền vàng</span> = nâng cấp cho MAFC, gắn mã FR để truy vết. Bấm <b>"Thay đổi"</b> để xem modal Phân bổ &amp; Gọi lại (phân bổ theo CPS + cơ chế recall).
         </div>
       </div>
     </div>
@@ -295,9 +295,8 @@
   <div class="rail"><div class="x" onclick="closeModal()">✕</div></div>
   <div class="mbody">
     <h3>Cấu hình phân bổ cuộc gọi</h3>
-    <div class="seg"><button id="segFixed" class="on" onclick="segTo('fixed')">Cố định</button><button id="segRT" onclick="segTo('rt')">Theo thời gian thực</button></div>
 
-    <!-- PANEL: Cố định -->
+    <!-- PANEL: Cố định (chế độ duy nhất) -->
     <div id="panelFixed">
       <div class="mdesc">Thực hiện việc phân bổ một số lượng cụ thể của các cuộc gọi trong một khoảng thời gian cố định.</div>
       <div class="up" style="margin-top:14px">
@@ -306,27 +305,6 @@
         <div class="miniinput" style="margin-top:4px"><span><span class="k">CPS — số cuộc gọi đồng thời mỗi giây</span>5</span><span class="u">cuộc / giây</span></div>
         <div class="up-note">Số lượng cuộc gọi hệ thống khởi tạo <b>đồng thời mỗi giây</b> (Calls Per Second). Giá trị càng cao gọi càng nhanh nhưng tốn kênh (CCU) &amp; dễ nghẽn. <b>❓ Cần chốt:</b> min/max &amp; mặc định (ràng buộc theo CCU tối đa của phiên).</div>
       </div>
-    </div>
-
-    <!-- PANEL: Theo thời gian thực (giữ nguyên UI hiện có) -->
-    <div id="panelRT" class="hidden">
-      <div class="mdesc">Hệ thống tự động tính toán theo thời gian thực với các tham số của chiến dịch để điều chỉnh số lượng cuộc gọi, đảm bảo tỷ lệ khách hàng được phục vụ tốt nhất.</div>
-      <div class="mh">Cấu hình chi tiết</div>
-      <div class="mdesc" style="margin-top:0">Hệ thống phân bố <span class="hl-g">N(t)</span> mỗi <span class="hl-b">Sa(t)</span>, gọi lại <span class="hl-o">N(t)</span> mỗi <span class="hl-b">Sa(t)</span> nếu không nghe máy.</div>
-      <div class="grid2m">
-        <div class="miniinput"><span><span class="k">Số cuộc gọi mỗi lần</span><span class="hl-g">N(t)</span></span><span class="u">Lần</span></div>
-        <div class="miniinput"><span><span class="k">Khoảng cách gọi giữa các lần</span><span class="hl-b">Sa(t)</span></span><span class="u">giây</span></div>
-      </div>
-      <div class="formula" style="margin-top:12px">
-        <div class="eq">N(t) = α × Fa(t) / Ra(t)</div>
-        <p><b>α</b>: Tỷ lệ an toàn có thể giao động từ 0.5 đến 1.5, để điều chỉnh số lượng cuộc gọi ít hơn hoặc nhiều hơn theo công thức thời gian thực.</p>
-        <p><b>Fa(t)</b>: Số lượng nhân viên đang rảnh (Free Agent) tại thời điểm t.</p>
-        <p><b>Ra(t)</b>: Tỷ lệ nghe máy (Answer Rate) được ước tính hoặc đo lường theo thời gian thực tại thời điểm t.</p>
-      </div>
-      <div class="miniinput" style="margin-top:12px"><span><span class="k">Tỷ lệ an toàn mặc định (α) *</span>1</span></div>
-      <div class="mdesc" style="margin:14px 0 6px"><span class="hl-b">Sa(t)</span> = Thời gian trung bình nghe máy trong chiến dịch (Giây)</div>
-      <div class="mh" style="font-size:13px;margin:14px 0 6px">Nhóm nội bộ</div>
-      <div class="addbox">＋</div>
     </div>
 
     <!-- EXISTING (không nâng cấp): Thời gian cho phép gọi -->
@@ -384,13 +362,6 @@
   function openModal(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
   function closeModal(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-
-  function segTo(mode){
-    document.getElementById('segFixed').classList.toggle('on',mode==='fixed');
-    document.getElementById('segRT').classList.toggle('on',mode==='rt');
-    document.getElementById('panelFixed').classList.toggle('hidden',mode!=='fixed');
-    document.getElementById('panelRT').classList.toggle('hidden',mode!=='rt');
-  }
 
   document.querySelectorAll('.opt[data-grp]').forEach(o=>{
     o.addEventListener('click',()=>{document.querySelectorAll('.opt[data-grp="'+o.dataset.grp+'"]').forEach(x=>x.classList.remove('on'));o.classList.add('on');});
