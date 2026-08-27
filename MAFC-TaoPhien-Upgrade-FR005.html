@@ -299,11 +299,17 @@
     <!-- PANEL: Cố định (chế độ duy nhất) -->
     <div id="panelFixed">
       <div class="mdesc">Thực hiện việc phân bổ một số lượng cụ thể của các cuộc gọi trong một khoảng thời gian cố định.</div>
-      <div class="up" style="margin-top:14px">
-        <span class="frtag">NÂNG CẤP · FR-005</span>
-        <div class="uptitle"><span class="star">◆</span> Phân bổ theo CPS</div>
-        <div class="miniinput" style="margin-top:4px"><span><span class="k">CPS — số cuộc gọi đồng thời mỗi giây</span>5</span><span class="u">cuộc / giây</span></div>
-        <div class="up-note">Số lượng cuộc gọi hệ thống khởi tạo <b>đồng thời mỗi giây</b> (Calls Per Second). Giá trị càng cao gọi càng nhanh nhưng tốn kênh (CCU) &amp; dễ nghẽn. <b>❓ Cần chốt:</b> min/max &amp; mặc định (ràng buộc theo CCU tối đa của phiên).</div>
+      <div class="mh">Cấu hình chi tiết</div>
+      <div class="mdesc" style="margin-top:0">Hệ thống phân bổ <span class="hl-g">10 cuộc gọi</span> mỗi <span class="hl-b">30 giây</span></div>
+      <div class="tcards" style="margin-top:10px">
+        <div class="tcard">
+          <div class="tc-lbl">Số cuộc gọi mỗi lần <span style="color:var(--req,#E5484D)">*</span> <span class="tc-q" title="Số cuộc gọi hệ thống khởi tạo trong mỗi lần phân bổ.">(?)</span></div>
+          <div class="tc-row"><input class="tc-in" value="10"></div>
+        </div>
+        <div class="tcard">
+          <div class="tc-lbl">Khoảng cách gọi giữa các lần <span style="color:var(--req,#E5484D)">*</span> <span class="tc-q" title="Khoảng thời gian giữa 2 lần phân bổ cuộc gọi.">(?)</span></div>
+          <div class="tc-row"><input class="tc-in" value="30"><span class="tc-u">giây</span></div>
+        </div>
       </div>
     </div>
 
