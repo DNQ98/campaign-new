@@ -286,7 +286,7 @@
   <div class="filtbar"><span class="fb">▼ Hình thức ▾</span><span class="fb">Loại khách hàng ▾</span><span class="clear">⌦</span></div>
   <div class="search">🔍 Tìm kiếm</div>
   <div class="thead"><span>#</span><span>Tên đầy đủ</span><span>Số điện thoại</span><span>Giọng đọc</span><span>Hình thức</span><span>Tên kịch bản</span><span>Danh sách biến</span><span>▤</span></div>
-  <div class="foot"><button class="primary">Tạo phiên</button><button class="ghost">Đóng</button></div>
+  <div class="foot"><button class="primary" onclick="openDetail()">Tạo phiên</button><button class="ghost">Đóng</button></div>
 </div>
 
 <!-- ===== MODAL ===== -->
@@ -509,3 +509,428 @@
   document.addEventListener('click',e=>{if(!e.target.closest('.search-dd'))closeDD();});
   renderChips();renderDD();
 </script>
+
+<!-- MERGE FR-005 -> Chi tiet phien (iframe cach ly) -->
+<div id="detailHost" style="display:none;position:fixed;inset:0;z-index:2000;background:#EEF1F5;"></div>
+<script type="text/plain" id="__detailSrc"><meta charset="utf-8">
+<style>
+  :root{
+    --bg:#EEF1F5; --card:#FFFFFF; --ink:#1F2A37; --sub:#5B6675; --label:#6B7480;
+    --green:#1BA85C; --green-d:#17914E; --green-soft:#E7F6EE;
+    --input:#F4F6F8; --border:#E3E8EE; --border2:#D6DCE3; --link:#3B82F6;
+    --blue:#2F80ED; --amber:#C77C10; --red:#D8453B; --red-soft:#FBE7E5;
+    --up:#F59E0B; --up-bg:#FFFBEB; --up-line:#F5C560; --up-badge-bg:#FEF3C7; --up-badge-tx:#8A5A00;
+    --rail:#1E2A3A;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","Be Vietnam Pro",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.45;margin:0;}
+  .anno{background:var(--rail);color:#cdd7e2;font-size:13px;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .anno b{color:#fff;}
+  .anno .demo{margin-left:auto;display:flex;gap:8px;}
+  .anno .demo button{background:#2b3a4d;color:#fff;border:1px solid #3a4a5e;border-radius:8px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .anno .demo button.on{background:var(--green);border-color:var(--green);}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 22px 60px;}
+
+  /* header */
+  .hdr{display:flex;align-items:center;gap:22px;border-bottom:1px solid var(--border);padding-bottom:0;margin-bottom:18px;position:relative;}
+  .hdr .back{width:40px;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);display:grid;place-items:center;font-size:16px;color:var(--ink);}
+  .htab{padding:14px 2px;font-size:15px;color:var(--sub);font-weight:600;cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;}
+  .htab.on{color:var(--ink);border-bottom-color:var(--blue);}
+  .hdr .actions{margin-left:auto;display:flex;gap:10px;align-items:center;}
+  .btn{border:none;border-radius:9px;padding:10px 16px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;}
+  .btn.pause{background:var(--rail);color:#fff;}
+  .btn.resume{background:var(--green);color:#fff;}
+  .btn.add{background:var(--up-bg);color:var(--up-badge-tx);border:1.5px solid var(--up);}
+  .btn.add:hover{background:#FEF3C7;}
+  .btn.resched{background:#FDECEC;color:var(--red);border:1px solid #F3B9B9;}
+  .btn.resched:hover{background:#FBE0E0;}
+
+  /* banner */
+  .banner{border-radius:12px;padding:12px 18px;font-size:13.5px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .banner.prep{background:#FEF3C7;color:#8A5A00;}
+  .banner.paused{background:var(--up-bg);color:#8A5A00;border:1.5px dashed var(--up);}
+
+  /* info card */
+  .infocard{background:#fff;border:1px solid var(--border);border-radius:16px;display:grid;grid-template-columns:340px 1fr;gap:0;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.03);}
+  .ic-left{padding:22px 24px;border-right:1px solid var(--border);}
+  .ic-left .who{font-size:15px;font-weight:700;}
+  .ic-left .phone{font-size:15px;color:var(--ink);margin:6px 0 16px;display:flex;align-items:center;gap:8px;}
+  .spin{width:14px;height:14px;border:2px solid #D6DEE7;border-top-color:var(--blue);border-radius:50%;display:inline-block;animation:sp 1s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .kbcard{background:var(--input);border-radius:11px;padding:12px 14px;}
+  .kbcard .r1{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);}
+  .kbcard .r2{display:flex;justify-content:space-between;align-items:center;margin-top:3px;}
+  .kbcard .nm{font-size:14px;font-weight:600;}
+  .kbcard .lnk{color:var(--green);font-size:12.5px;font-weight:600;cursor:pointer;}
+  .ic-left .by{font-size:12.5px;color:var(--sub);margin-top:16px;}
+  .ic-right{padding:22px 26px;}
+  .ic-right .st{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:var(--green);margin-bottom:18px;}
+  .ic-right .st .sub{color:var(--sub);font-weight:500;}
+  .ic-right .st .vnd{margin-left:auto;color:var(--blue);font-weight:700;}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:16px 40px;}
+  .kpi .k{font-size:12.5px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:6px;}
+  .kpi .v{font-size:15px;font-weight:700;margin-top:3px;}
+  .kpi .v.g{color:var(--green);} .kpi .v.a{color:var(--amber);} .kpi .v.r{color:var(--red);}
+  .q{color:#9AA6B2;font-size:12px;cursor:help;font-weight:400;}
+  .allocline{margin-top:18px;font-size:13px;color:var(--ink);display:flex;align-items:center;gap:8px;font-weight:600;}
+  .allocline .ic{color:var(--sub);}
+  .subline{font-size:12px;color:var(--sub);margin-top:2px;}
+  .recallline{margin-top:12px;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--ink);}
+  .recallline .x{width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:11px;}
+
+  /* filter + table */
+  .filt{display:flex;flex-wrap:wrap;gap:9px;background:#F3F5F8;border-radius:12px;padding:12px 14px;margin:18px 0 0;}
+  .filt .f{font-size:13px;color:var(--sub);background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 11px;}
+  .search{margin-top:14px;border:1px solid var(--border2);border-radius:12px;padding:11px 15px;color:#9AA6B2;font-size:13.5px;}
+  .twrap{margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{background:#F7F9FB;text-align:left;padding:12px 14px;font-size:11.5px;letter-spacing:.3px;color:var(--label);font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--border);}
+  td{padding:13px 14px;border-bottom:1px solid #EEF1F4;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .callicon{color:var(--green);font-size:15px;}
+  .callicon.proc{color:#9AA6B2;}
+  .cust .nm{font-weight:600;} .cust .ph{color:var(--sub);font-size:12px;}
+  .addcust{display:inline-flex;align-items:center;gap:4px;color:var(--up-badge-tx);background:var(--up-bg);border:1px solid var(--up-line);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;margin-top:4px;cursor:pointer;}
+  .kbtag{color:var(--blue);font-weight:600;}
+  .proc-txt{color:#9AA6B2;}
+  .dim{color:#9AA6B2;}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(16,24,40,.5);display:none;z-index:40;}
+  .overlay.show{display:block;}
+  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.98);opacity:0;pointer-events:none;transition:.2s;
+          width:900px;max-width:94vw;height:90vh;max-height:920px;background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.28);z-index:50;display:flex;flex-direction:column;overflow:hidden;}
+  .modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+  .m-close{position:fixed;top:calc(5vh - 6px);left:calc(50% - 470px);width:44px;height:44px;border-radius:50%;background:var(--rail);color:#fff;display:none;place-items:center;font-size:16px;cursor:pointer;z-index:51;}
+  .modal.show ~ .m-close{display:grid;}
+  @media(max-width:960px){.m-close{left:12px;top:12px;}}
+  .m-tabs{display:flex;gap:26px;padding:0 26px;border-bottom:1px solid var(--border);}
+  .m-tab{padding:18px 2px;font-size:15px;font-weight:700;color:#9AA6B2;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:7px;}
+  .m-tab.on{color:var(--ink);border-bottom-color:var(--ink);}
+  .m-upnote{background:var(--up-bg);border-bottom:1px solid var(--up-line);padding:9px 26px;font-size:12px;color:#7a5300;display:flex;align-items:center;gap:8px;}
+  .m-upnote .bdg{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--up-badge-tx);background:var(--up-badge-bg);border-radius:5px;padding:2px 7px;}
+  .m-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;}
+  .m-col{padding:22px 26px;}
+  .m-col.left{border-right:1px solid var(--border);}
+  .m-col h4{margin:0 0 14px;font-size:15px;}
+  .varbox{border:1.5px solid #BEDBFB;background:#F2F8FF;border-radius:11px;overflow:hidden;}
+  .varrow{padding:11px 14px;border-bottom:1px solid #E1EEFB;}
+  .varrow:last-child{border-bottom:none;}
+  .varrow .top{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+  .varrow .lbl{color:var(--blue);font-weight:600;display:flex;align-items:center;gap:5px;}
+  .varrow .code{color:var(--blue);font-family:ui-monospace,Menlo,monospace;font-size:11.5px;}
+  .varrow .val{font-size:13.5px;color:var(--ink);margin-top:4px;}
+  .varrow .val.ph{color:#9AA6B2;}
+  .greenbtn{background:var(--green);color:#fff;border:none;border-radius:11px;padding:13px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .greenbtn .cnt{opacity:.85;font-weight:500;}
+  .searchbar{border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:#9AA6B2;font-size:13.5px;display:flex;align-items:center;gap:8px;}
+  .emptybox{color:#9AA6B2;font-size:13px;margin-top:16px;}
+  .selfield{border:1px solid var(--border2);border-radius:11px;padding:9px 14px;margin-bottom:12px;background:#fff;}
+  .selfield.hl{background:#F2F8FF;border-color:#BEDBFB;}
+  .selfield .top{display:flex;justify-content:space-between;font-size:12px;}
+  .selfield .top .lbl{color:var(--sub);font-weight:600;} .selfield .top .code{color:var(--blue);font-family:ui-monospace,Menlo,monospace;font-size:11.5px;}
+  .selfield .sel{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-top:4px;color:var(--ink);}
+  .grouphd{font-size:14px;font-weight:700;margin:20px 0 6px;display:flex;justify-content:space-between;}
+  .grouphd .rs{color:var(--sub);font-size:12.5px;font-weight:500;cursor:pointer;}
+  .subnote{font-size:12px;color:#9AA6B2;font-style:italic;line-height:1.5;margin:6px 0 12px;}
+  .radiorow{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink);margin:12px 0;}
+  .radiorow .rd{width:18px;height:18px;border:2px solid #B7C0CB;border-radius:50%;flex:none;}
+  .radiorow.on .rd{border-color:var(--blue);box-shadow:inset 0 0 0 3px var(--blue);}
+  .chkrow{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--blue);}
+  .chkrow .ck{width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;}
+  .filtcard{background:var(--input);border-radius:11px;padding:14px 16px;margin-bottom:12px;}
+  .filtcard .t{font-size:13.5px;font-weight:700;} .filtcard .c{font-size:12.5px;color:#9AA6B2;margin-top:3px;}
+  .adddash{border:1.5px dashed var(--border2);border-radius:11px;padding:13px;text-align:center;color:var(--sub);font-size:13px;cursor:pointer;}
+  .excel-drop{border:1.5px dashed #A7D8B8;border-radius:10px;padding:10px 16px;color:var(--green);font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;}
+  .excel-hint{background:#F3F5F8;border-radius:8px;padding:6px 12px;font-size:12.5px;color:var(--sub);display:inline-block;margin-bottom:12px;}
+  .rightmid{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center;}
+  .m-foot{border-top:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;gap:14px;}
+  .cc{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);}
+  .cc .pill{border:1px solid var(--border2);border-radius:16px;padding:5px 12px;font-size:12px;color:#41506A;cursor:pointer;background:#fff;}
+  .cc .pill.on{background:var(--rail);color:#fff;border-color:var(--rail);font-weight:600;}
+  .m-foot .acts{margin-left:auto;display:flex;gap:10px;}
+  .m-foot .primary{background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+  .m-foot .ghost{background:#F3F5F8;border:1px solid var(--border);border-radius:10px;padding:12px 22px;font-family:inherit;font-size:14px;font-weight:600;color:#41506A;cursor:pointer;}
+  .tabpane{display:none;} .tabpane.on{display:contents;}
+  /* popup ưu tiên */
+  .overlay2{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;z-index:60;}
+  .overlay2.show{display:block;}
+  .pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;transition:.18s;
+        width:520px;max-width:94vw;background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.3);z-index:61;overflow:hidden;}
+  .pop.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+  .pop-hd{padding:20px 24px 6px;}
+  .pop-hd h3{margin:0;font-size:17px;}
+  .pop-hd p{margin:6px 0 0;font-size:13px;color:var(--sub);}
+  .pop-bd{padding:16px 24px 8px;display:flex;flex-direction:column;gap:12px;}
+  .opt{border:1.5px solid var(--border2);border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;}
+  .opt.on{border-color:var(--green);background:var(--green-soft);}
+  .opt .rd{width:20px;height:20px;border:2px solid #B7C0CB;border-radius:50%;flex:none;margin-top:1px;}
+  .opt.on .rd{border-color:var(--green);box-shadow:inset 0 0 0 4px var(--green);}
+  .opt .ot{font-size:14px;font-weight:700;} .opt .od{font-size:12.5px;color:var(--sub);margin-top:3px;line-height:1.5;}
+  .opt .tag{font-size:10px;font-weight:700;color:var(--green);background:var(--green-soft);border:1px solid #A7D8B8;border-radius:5px;padding:1px 6px;margin-left:6px;}
+  .pop-note{margin:4px 24px 0;font-size:11.5px;color:#9AA6B2;font-style:italic;}
+  .pop-ft{padding:16px 24px;display:flex;gap:10px;justify-content:flex-end;}
+  .pop-ft .primary{background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+  .pop-ft .ghost{background:#F3F5F8;border:1px solid var(--border);border-radius:10px;padding:11px 20px;font-family:inherit;font-size:14px;font-weight:600;color:#41506A;cursor:pointer;}
+  .hidden{display:none;}
+</style>
+
+<div class="anno">
+  Mockup <b>Chi tiết phiên Callbot — MAFC (FR-021)</b> · trạng thái phiên + tính năng <b>NÂNG CẤP: Bổ sung khách hàng khi phiên tạm dừng</b>
+  <span class="demo">
+    <button id="dRun" onclick="setState('run')">Đang chạy</button>
+    <button id="dPause" class="on" onclick="setState('pause')">Tạm dừng</button>
+    <button onclick="openAdd()" style="background:var(--up);border-color:var(--up)">＋ Bổ sung KH</button>
+  </span>
+</div>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="back" onclick="if(parent&&parent.backToCreate)parent.backToCreate()">←</div>
+    <div class="htab on">Xem chi tiết 🗒</div>
+    <div class="htab">Báo cáo 📊</div>
+    <div class="htab">Thực hiện gửi lại phiên ⟳</div>
+    <div class="htab">Hủy phiên 🗑</div>
+    <div class="actions" id="hdrActions"></div>
+  </div>
+
+  <!-- BANNER -->
+  <div id="banner" class="banner"></div>
+
+  <!-- INFO CARD -->
+  <div class="infocard">
+    <div class="ic-left">
+      <div class="who">Không xác định</div>
+      <div class="phone">8989666666 <span class="spin"></span></div>
+      <div class="kbcard">
+        <div class="r1"><span>Kịch bản AI Callbot</span><span>Ngọc Anh</span></div>
+        <div class="r2"><span class="nm">Bất động sản</span><span class="lnk">Xem chi tiết ▾</span></div>
+      </div>
+      <div class="by">Tạo bởi <b>Hello Thiên Quân</b></div>
+    </div>
+    <div class="ic-right">
+      <div class="st" id="stLine"></div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Ngày tạo</div><div class="v">10:31 27/08/2026</div></div>
+        <div class="kpi"><div class="k">Ngày thực hiện</div><div class="v">10:31 27/08/2026</div></div>
+        <div class="kpi"><div class="k">Số lượng khách hàng</div><div class="v" id="kTotal">11</div></div>
+        <div class="kpi"><div class="k">Đang chờ</div><div class="v a" id="kWait">10</div></div>
+        <div class="kpi"><div class="k">Trả lời</div><div class="v g">1</div></div>
+        <div class="kpi"><div class="k">Không trả lời</div><div class="v">0</div></div>
+        <div class="kpi"><div class="k">Cuộc gọi thất bại <span class="q" title="Cuộc không thực hiện được ở tầng điều phối (chưa qua tổng đài)">(?)</span></div><div class="v r">0</div></div>
+        <div class="kpi"><div class="k">Cuộc gọi bị hủy <span class="q" title="Cuộc bị hủy khi tạm dừng/hủy phiên">(?)</span></div><div class="v r">0</div></div>
+        <div class="kpi"><div class="k">Mục đích cuộc gọi</div><div class="v" style="font-weight:600">Không áp dụng</div></div>
+        <div class="kpi"><div class="k">Không hợp lệ</div><div class="v r">0</div></div>
+      </div>
+      <div class="allocline"><span class="ic">🗂</span> Phân bổ 1 cuộc gọi mỗi 30s</div>
+      <div class="subline">Cả ngày</div>
+      <div class="recallline"><span class="x">✕</span> Gọi lại khi không nghe máy</div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filt">
+    <span class="f">▽</span><span class="f">Hình thức ▾</span><span class="f">Đầu số ▾</span><span class="f">Trạng thái ▾</span>
+    <span class="f">Tag ▾</span><span class="f">Phân loại ▾</span><span class="f">Hộp thư thoại ▾</span><span class="f">Trạng thái tổng đài ▾</span>
+  </div>
+  <div class="search">🔍 Tìm kiếm | <span id="cnt">11</span> cuộc gọi</div>
+
+  <!-- TABLE -->
+  <div class="twrap">
+    <table>
+      <thead><tr>
+        <th style="width:34px">#</th><th>Nhân viên</th><th>Khách hàng</th><th>Hình thức</th><th>Kịch bản</th><th>Liên quan</th><th>Lý do kết thúc cuộc gọi</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL: Bổ sung khách hàng vào phiên (khớp UI thật OMICRM) -->
+<div class="overlay" id="ovl" onclick="closeAdd()"></div>
+<div class="modal" id="mdl">
+  <div class="m-tabs">
+    <div class="m-tab on" data-tab="manual" onclick="switchTab('manual')">Thủ công 🗂</div>
+    <div class="m-tab" data-tab="excel" onclick="switchTab('excel')">File Excel 📊</div>
+    <div class="m-tab" data-tab="attr" onclick="switchTab('attr')">Thuộc tính khách hàng 🧾</div>
+  </div>
+  <div class="m-upnote"><span class="bdg">NÂNG CẤP · FR-024</span> Bổ sung data vào <b>phiên đang tạm dừng</b> — gộp vào hàng đợi, gọi tiếp khi bấm "Bắt đầu lại". Kiểm tra trùng số trong phiên trước khi thêm.</div>
+
+  <div class="m-body">
+    <!-- ===== TAB THỦ CÔNG ===== -->
+    <div class="tabpane on" data-pane="manual">
+      <div class="m-col left">
+        <h4>Thêm khách hàng</h4>
+        <div class="varbox">
+          <div class="varrow">
+            <div class="top"><span class="lbl" style="color:var(--blue)">Thông tin cơ bản ▾</span></div>
+            <div class="val ph">Số điện thoại, thông tin khách hàng</div>
+          </div>
+          <div class="varrow">
+            <div class="top"><span class="lbl">Chưa liên kết biến ▾</span><span class="code">{{XSt8Qq2s1k}}</span></div>
+            <div class="val ph">Nhập giá trị</div>
+          </div>
+          <div class="varrow">
+            <div class="top"><span class="lbl">Chưa liên kết biến ▾</span><span class="code">{{rm7pPAJude}}</span></div>
+            <div class="val ph">Nhập giá trị</div>
+          </div>
+        </div>
+        <button class="greenbtn">Thêm vào phiên gửi <span class="cnt">0/2,000</span> →</button>
+      </div>
+      <div class="m-col">
+        <h4>Danh sách thêm khả dụng</h4>
+        <div class="searchbar">🔍 Tìm kiếm</div>
+        <div class="emptybox">Không có dữ liệu</div>
+      </div>
+    </div>
+
+    <!-- ===== TAB FILE EXCEL ===== -->
+    <div class="tabpane" data-pane="excel">
+      <div class="m-col left">
+        <h4>Cấu hình giá trị cột</h4>
+        <div class="selfield hl">
+          <div class="top"><span class="lbl">Chưa liên kết biến ▾</span><span class="code">{{XSt8Qq2s1k}}</span></div>
+          <div class="sel">Cột B <span>▾</span></div>
+        </div>
+        <div class="selfield">
+          <div class="top"><span class="lbl">Chưa liên kết biến ▾</span><span class="code">{{rm7pPAJude}}</span></div>
+          <div class="sel">Cột C <span>▾</span></div>
+        </div>
+        <div class="grouphd" style="margin-top:22px">Tùy chọn trong file Excel</div>
+        <div class="chkrow"><span class="ck">✓</span> Xử lý dữ liệu trùng</div>
+        <div class="subnote">Nếu trong File Excel tồn tại các dòng trùng giá trị số điện thoại hoặc Email, hệ thống sẽ lấy giá trị của dòng tùy chọn bên dưới</div>
+        <div class="selfield">
+          <div class="top"><span class="lbl">Dòng giá trị được lấy</span></div>
+          <div class="sel">Giá trị đầu tiên <span>▾</span></div>
+        </div>
+        <div class="radiorow on"><span class="rd"></span> Bỏ qua dữ liệu trùng</div>
+        <div class="radiorow"><span class="rd"></span> Đồng bộ giá trị trùng</div>
+      </div>
+      <div class="m-col">
+        <div class="rightmid">
+          <div class="excel-hint">Số điện thoại: Cột A</div>
+          <div class="excel-drop">Chọn file Excel 📊</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB THUỘC TÍNH KHÁCH HÀNG ===== -->
+    <div class="tabpane" data-pane="attr">
+      <div class="m-col left">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="selfield" style="margin:0;padding:6px 11px;font-size:12px">Chưa liên kết biến ▾ <b style="color:var(--blue);font-family:ui-monospace,Menlo,monospace">{{XSt8Qq2s1k}}</b></span>
+          <span class="selfield hl" style="margin:0;padding:6px 11px;font-size:12px">Chưa liên kết biến ▾ <b style="color:var(--blue);font-family:ui-monospace,Menlo,monospace">{{rm7pPAJude}}</b></span>
+        </div>
+        <div class="grouphd">Bộ lọc thuộc tính <span class="rs">Đặt lại</span></div>
+        <div class="filtcard"><div class="t">Tag</div><div class="c">Chưa có dữ liệu</div></div>
+        <div class="filtcard"><div class="t">Nhóm</div><div class="c">Chưa có dữ liệu</div></div>
+        <div class="filtcard"><div class="t">Ngành</div><div class="c">Chưa có dữ liệu</div></div>
+        <div class="adddash">＋ Thêm thuộc tính</div>
+        <button class="greenbtn">Thêm vào phiên gửi →</button>
+      </div>
+      <div class="m-col">
+        <h4>Danh sách thêm khả dụng</h4>
+        <div class="searchbar">🔍 Tìm kiếm</div>
+        <div class="emptybox">Không có dữ liệu</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-foot">
+    <div class="cc">Mã quốc gia
+      <span class="pill on">Không áp dụng</span><span class="pill">+84</span><span class="pill">84</span><span class="pill">0084</span><span class="pill">Tùy chỉnh</span>
+    </div>
+    <div class="acts">
+      <button class="primary" onclick="openPriority()">Thêm khách hàng</button>
+      <button class="ghost" onclick="closeAdd()">Đóng</button>
+    </div>
+  </div>
+</div>
+<div class="m-close" onclick="closeAdd()">✕</div>
+
+<!-- POPUP: Ưu tiên khi thêm data mới -->
+<div class="overlay2" id="ovl2" onclick="closePriority()"></div>
+<div class="pop" id="pop">
+  <div class="pop-hd">
+    <h3>Thứ tự gọi khi thêm data mới</h3>
+    <p>Chọn cách hệ thống xếp <b>data vừa thêm</b> vào hàng đợi của phiên trước khi tiếp tục.</p>
+  </div>
+  <div class="pop-bd">
+    <div class="opt" data-pr="new" onclick="pickPr('new')">
+      <span class="rd"></span>
+      <div><div class="ot">Ưu tiên data mới</div>
+        <div class="od">Data vừa thêm được <b>chèn lên đầu hàng đợi</b>, gọi trước data cũ chưa hoàn tất.</div></div>
+    </div>
+    <div class="opt on" data-pr="old" onclick="pickPr('old')">
+      <span class="rd"></span>
+      <div><div class="ot">Ưu tiên data cũ <span class="tag">MẶC ĐỊNH</span></div>
+        <div class="od">Gọi hết <b>data cũ</b> trong hàng đợi rồi mới đến data mới (FIFO).</div></div>
+    </div>
+  </div>
+  <div class="pop-note">Áp dụng cho lượt bổ sung này; data mới vẫn gọi theo cấu hình phân bổ &amp; recall hiện có của phiên.</div>
+  <div class="pop-ft">
+    <button class="ghost" onclick="closePriority()">Quay lại</button>
+    <button class="primary" onclick="confirmAdd()">Xác nhận thêm</button>
+  </div>
+</div>
+
+<script>
+  const ROWS=[
+    {icon:'ok',time:'10:31 27/08/2026',sub:'Callbot / Trả lời',cust:'022588173',phone:'8989666666',kb:'Bất động sản'},
+    {icon:'proc',time:'Đang xử lý',sub:'',cust:'029163841',phone:'',kb:'Bất động sản'},
+    {icon:'proc',time:'Đang xử lý',sub:'',cust:'015318008',phone:'',kb:'Bất động sản'},
+    {icon:'wait',time:'Đang chờ',sub:'',cust:'038774521',phone:'',kb:'Bất động sản'},
+    {icon:'wait',time:'Đang chờ',sub:'',cust:'090225xxxx',phone:'',kb:'Bất động sản'},
+  ];
+  function renderRows(){
+    document.getElementById('tbody').innerHTML=ROWS.map((r,i)=>{
+      const ic=r.icon==='ok'?'<span class="callicon">📞</span>':r.icon==='proc'?'<span class="callicon proc">📞</span>':'<span class="callicon proc">📞</span>';
+      const emp=r.icon==='ok'?'Không xác định<br><span class="dim" style="font-size:12px">'+r.phone+'</span>':'<span class="proc-txt">'+r.time+'</span>';
+      const timecell=r.icon==='ok'?(ic+' '+r.time+'<br><span class="dim" style="font-size:12px">'+r.sub+'</span>'):(ic+' <span class="proc-txt">'+r.time+'</span>');
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${timecell}</td>
+        <td class="cust"><div class="ph">${r.cust}</div><span class="addcust">＋ gán KH</span></td>
+        <td>Excel</td>
+        <td><span class="kbtag">${r.kb}</span></td>
+        <td class="dim">-</td>
+        <td class="dim">-</td>
+      </tr>`;
+    }).join('');
+  }
+  let state='pause';
+  function setState(s){
+    state=s;
+    document.getElementById('dRun').classList.toggle('on',s==='run');
+    document.getElementById('dPause').classList.toggle('on',s==='pause');
+    const act=document.getElementById('hdrActions');
+    const banner=document.getElementById('banner');
+    const stLine=document.getElementById('stLine');
+    if(s==='run'){
+      act.innerHTML='<button class="btn pause" onclick="setState(\'pause\')">⏸ Tạm dừng phiên gọi</button>';
+      banner.style.display=''; banner.className='banner prep'; banner.innerHTML='⏳ Đang chuẩn bị dữ liệu đến 10:31 27/08/2026';
+      stLine.innerHTML='<span style="color:var(--green)">✔</span> <b>Đang xử lý</b> <span class="sub">· 1 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+    }else{
+      act.innerHTML='<button class="btn add" onclick="openAdd()">＋ Bổ sung khách hàng</button><button class="btn resched" onclick="setState(\'run\')">▶ Bắt đầu lại vào lúc 10:31 28/08/2026</button>';
+      banner.className='banner'; banner.innerHTML=''; banner.style.display='none';
+      stLine.innerHTML='<span style="color:var(--amber)">⏸</span> <b style="color:var(--amber)">Tạm ngưng</b> <span class="sub">· 1 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+    }
+  }
+  function openAdd(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
+  function closeAdd(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
+  function switchTab(t){
+    document.querySelectorAll('.m-tab').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
+    document.querySelectorAll('.tabpane').forEach(x=>x.classList.toggle('on',x.dataset.pane===t));
+  }
+  let prPick='old';
+  function openPriority(){document.getElementById('ovl2').classList.add('show');document.getElementById('pop').classList.add('show');}
+  function closePriority(){document.getElementById('ovl2').classList.remove('show');document.getElementById('pop').classList.remove('show');}
+  function pickPr(v){prPick=v;document.querySelectorAll('.opt[data-pr]').forEach(o=>o.classList.toggle('on',o.dataset.pr===v));}
+  function confirmAdd(){closePriority();closeAdd();}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAdd();});
+  renderRows(); setState('pause');
+<\/script>
+</script>
+<script>function openDetail(){ var h=document.getElementById('detailHost'); if(!h.dataset.loaded){  var f=document.createElement('iframe');  f.style.cssText='border:0;width:100%;height:100%;display:block';  f.srcdoc=document.getElementById('__detailSrc').textContent.replace(/<\\\/script>/g,'<'+'/script>');  h.appendChild(f); h.dataset.loaded='1'; } h.style.display='block'; document.documentElement.style.overflow='hidden';}function backToCreate(){ document.getElementById('detailHost').style.display='none'; document.documentElement.style.overflow='';}</script>
