@@ -348,15 +348,14 @@
       </div>
       <div class="up-note" style="margin:8px 0 0" id="rcHint"></div>
 
-      <div class="grid2m" style="margin-top:14px">
-        <div class="miniinput"><span><span class="k">Số lần recall tối đa *</span>2</span><span class="u">lần</span></div>
-        <div class="miniinput"><span><span class="k">Recall sau khoảng *</span>30</span><span class="u">phút</span></div>
+      <div class="mh" style="margin:16px 0 8px;font-size:13px">Gọi lại theo độ ưu tiên</div>
+      <div class="optrow" id="rcPriRow">
+        <div class="opt" data-pri="done" onclick="setRcPri('done')"><span class="rd"></span><div><div class="ot">Gọi lại sau khi data hoàn thành</div><div class="od">Chờ gọi xong toàn bộ danh sách/đợt data hiện tại rồi mới thực hiện gọi lại</div></div></div>
+        <div class="opt on" data-pri="cfg" onclick="setRcPri('cfg')"><span class="rd"></span><div style="flex:1"><div class="ot">Gọi lại theo cấu hình</div><div class="od">Cấu hình số lần và khoảng cách giữa các lần gọi lại</div></div></div>
       </div>
-
-      <div class="mh" style="margin:16px 0 8px;font-size:13px">Thời điểm thực hiện recall</div>
-      <div class="optrow">
-        <div class="opt"><span class="rd"></span><div><div class="ot">Recall sau khi đợt data hoàn thành</div><div class="od">Chờ gọi xong toàn bộ danh sách/đợt data hiện tại rồi mới thực hiện recall</div></div></div>
-        <div class="opt on"><span class="rd"></span><div style="flex:1"><div class="ot">Recall sau khoảng thời gian cấu hình</div><div class="od">Sau mỗi khoảng thời gian kể từ lần gọi trước (theo ô “Recall sau khoảng” ở trên)</div></div></div>
+      <div class="grid2m" id="rcCfgBox" style="margin-top:12px">
+        <div class="miniinput"><span><span class="k">Số lần gọi lại tối đa *</span>2</span><span class="u">lần</span></div>
+        <div class="miniinput"><span><span class="k">Gọi lại sau khoảng *</span>30</span><span class="u">phút</span></div>
       </div>
     </div>
 
@@ -467,6 +466,10 @@
     document.querySelectorAll('.rc-radio').forEach(r=>r.classList.toggle('on',r.dataset.rt===t));
     document.getElementById('ddSearch').value='';
     renderChips();renderDD();
+  }
+  function setRcPri(v){
+    document.querySelectorAll('#rcPriRow .opt').forEach(o=>o.classList.toggle('on',o.dataset.pri===v));
+    document.getElementById('rcCfgBox').style.display = v==='cfg' ? 'grid' : 'none';
   }
   function openDD(e){e&&e.stopPropagation();document.getElementById('ddList').classList.remove('hidden');renderDD();}
   function closeDD(){document.getElementById('ddList').classList.add('hidden');}
