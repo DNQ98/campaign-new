@@ -348,6 +348,11 @@
       </div>
       <div class="up-note" style="margin:8px 0 0" id="rcHint"></div>
 
+      <div id="rcTalkBox" style="display:none;margin-top:12px">
+        <div class="miniinput" style="max-width:300px"><span><span class="k">Thời gian đàm thoại tối đa *</span>60</span><span class="u">giây</span></div>
+        <div class="up-note" style="margin:6px 0 0">Chỉ gọi lại cuộc <b>Trả lời</b> có thời lượng đàm thoại <b>≤ ngưỡng</b> này — cuộc bắt máy nhưng đàm thoại quá ngắn (coi như chưa hoàn tất mục tiêu) mới được recall.</div>
+      </div>
+
       <div class="grid2m" id="rcMax" style="margin-top:14px">
         <div class="miniinput"><span><span class="k">Số lần gọi lại tối đa *</span>2</span><span class="u">lần</span></div>
         <div class="miniinput"><span><span class="k">Khoảng cách giữa các lần gọi lại *</span>300</span><span class="u">giây</span></div>
@@ -490,6 +495,11 @@
       : recallType==='result'
       ? '<b>Trạng thái tổng đài</b>: <b>8 mã</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).'
       : '<b>Phân loại (1 cấp, khai báo trong kịch bản)</b>. Lấy theo <b>phân loại CUỐI CÙNG</b> mà cuộc gọi đi qua trong flow; cuộc có phân loại cuối ∈ các mã đã chọn sẽ được recall (OR). <i>Danh mục thật do kịch bản khai báo (giá trị minh hoạ).</i>';
+    updateTalkBox();
+  }
+  function updateTalkBox(){
+    const b=document.getElementById('rcTalkBox');
+    if(b) b.style.display=(recallType==='callstate'&&selCallstate.has('Trả lời'))?'block':'none';
   }
   function renderDD(){
     const list=document.getElementById('ddList');
