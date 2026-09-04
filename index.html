@@ -193,6 +193,9 @@
   .dd-item:hover{background:#F1F6FD;}
   .dd-item.picked{color:#9AA6B2;background:#F7F9FB;}
   .dd-item.picked::after{content:'✓ đã chọn';float:right;font-size:11px;color:var(--green);}
+  .rc-cond{margin-bottom:2px;}
+  .rc-or{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:800;color:#9AA6B2;letter-spacing:.1em;margin:12px 0;}
+  .rc-or::before,.rc-or::after{content:"";flex:1;height:1px;background:var(--border2);}
   .dd-group{padding:9px 14px;font-size:12px;font-weight:800;letter-spacing:.3px;color:#41506A;display:flex;align-items:center;gap:8px;cursor:pointer;background:#FAFBFC;}
   .dd-chev{font-size:10px;color:#9AA6B2;transition:transform .15s;width:10px;}
   .dd-node.closed > .dd-chev{transform:rotate(-90deg);}
@@ -331,26 +334,32 @@
       <span class="frtag">NÂNG CẤP · FR-005 / FR-025</span>
       <div class="togrow" style="margin-bottom:14px"><span class="toggle" onclick="this.classList.toggle('off')"></span> Bật cơ chế gọi lại</div>
 
-      <div class="rc-radios">
-        <label class="rc-radio" data-rt="callstate" onclick="setRecallType('callstate')"><span class="rd">✓</span> Theo trạng thái cuộc gọi</label>
-        <label class="rc-radio on" data-rt="result" onclick="setRecallType('result')"><span class="rd">✓</span> Theo Trạng thái tổng đài</label>
-        <label class="rc-radio" data-rt="cust" onclick="setRecallType('cust')"><span class="rd">✓</span> Theo Phân loại (kịch bản)</label>
+      <div class="up-note" style="margin:0 0 12px">Chọn điều kiện ở <b>một hoặc nhiều</b> nhóm bên dưới. Cuộc gọi khớp <b>bất kỳ</b> trạng thái đã chọn ở <b>bất kỳ</b> nhóm nào sẽ được gọi lại — gộp điều kiện bằng <b>HOẶC (OR)</b>.</div>
+
+      <!-- Nhóm 1: Trạng thái cuộc gọi -->
+      <div class="rc-cond">
+        <div class="sel-box"><div class="sb-lbl">Trạng thái cuộc gọi</div><div class="sel-chips" id="chips_callstate"></div></div>
+        <div class="search-dd"><div class="dd-input" onclick="openDD2(event,'callstate')"><span class="ic">🔍</span><input id="search_callstate" placeholder="Tìm kiếm" oninput="renderDD2('callstate')" onfocus="openDD2(event,'callstate')"></div><div class="dd-list hidden" id="list_callstate"></div></div>
+        <div id="rcTalkBox" style="display:none;margin-top:10px">
+          <div class="miniinput" style="max-width:300px"><span><span class="k">Thời gian đàm thoại tối đa *</span>60</span><span class="u">giây</span></div>
+          <div class="up-note" style="margin:6px 0 0">Chỉ gọi lại cuộc <b>Trả lời</b> có thời lượng đàm thoại <b>≤ ngưỡng</b> này — cuộc bắt máy nhưng đàm thoại quá ngắn (coi như chưa hoàn tất mục tiêu) mới được recall.</div>
+        </div>
       </div>
 
-      <div class="sel-box">
-        <div class="sb-lbl">Trạng thái</div>
-        <div class="sel-chips" id="selChips"></div>
+      <div class="rc-or">HOẶC</div>
+
+      <!-- Nhóm 2: Trạng thái tổng đài -->
+      <div class="rc-cond">
+        <div class="sel-box"><div class="sb-lbl">Trạng thái tổng đài <span style="font-weight:500;color:#8A96A3">· 8 mã (FR-009)</span></div><div class="sel-chips" id="chips_result"></div></div>
+        <div class="search-dd"><div class="dd-input" onclick="openDD2(event,'result')"><span class="ic">🔍</span><input id="search_result" placeholder="Tìm kiếm" oninput="renderDD2('result')" onfocus="openDD2(event,'result')"></div><div class="dd-list hidden" id="list_result"></div></div>
       </div>
 
-      <div class="search-dd">
-        <div class="dd-input" onclick="openDD(event)"><span class="ic">🔍</span><input id="ddSearch" placeholder="Tìm kiếm" oninput="renderDD()" onfocus="openDD(event)"></div>
-        <div class="dd-list hidden" id="ddList"></div>
-      </div>
-      <div class="up-note" style="margin:8px 0 0" id="rcHint"></div>
+      <div class="rc-or">HOẶC</div>
 
-      <div id="rcTalkBox" style="display:none;margin-top:12px">
-        <div class="miniinput" style="max-width:300px"><span><span class="k">Thời gian đàm thoại tối đa *</span>60</span><span class="u">giây</span></div>
-        <div class="up-note" style="margin:6px 0 0">Chỉ gọi lại cuộc <b>Trả lời</b> có thời lượng đàm thoại <b>≤ ngưỡng</b> này — cuộc bắt máy nhưng đàm thoại quá ngắn (coi như chưa hoàn tất mục tiêu) mới được recall.</div>
+      <!-- Nhóm 3: Phân loại (kịch bản) -->
+      <div class="rc-cond">
+        <div class="sel-box"><div class="sb-lbl">Phân loại (kịch bản) <span style="font-weight:500;color:#8A96A3">· theo phân loại cuối cùng</span></div><div class="sel-chips" id="chips_cust"></div></div>
+        <div class="search-dd"><div class="dd-input" onclick="openDD2(event,'cust')"><span class="ic">🔍</span><input id="search_cust" placeholder="Tìm kiếm" oninput="renderDD2('cust')" onfocus="openDD2(event,'cust')"></div><div class="dd-list hidden" id="list_cust"></div></div>
       </div>
 
       <div class="grid2m" id="rcMax" style="margin-top:14px">
@@ -461,70 +470,50 @@
     {name:'HUP',desc:'KH dập máy giữa chừng'},
     {name:'INIT',desc:'Chưa có kết quả phân loại'}
   ];
-  let recallType='result';
-  let selCallstate=new Set(['Không trả lời']);
-  let selResult=new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']);
-  let selCust=new Set(['CAB','RTP_NO_MONEY']);
-  const openDims=new Set(['ACTION CODE']);
-  const openC1=new Set();
+  const RC={
+    callstate:{sel:new Set(['Trả lời']), src:STATUS_CALLSTATE, kind:'status'},
+    result:{sel:new Set(['Không nghe máy','Bận','Ngoài vùng phủ sóng','Nhà mạng chặn','Lỗi chưa xác định']), src:CALLSTATUS, kind:'status'},
+    cust:{sel:new Set(['CAB','RTP_NO_MONEY']), src:PHANLOAI, kind:'phanloai'}
+  };
+  const RC_KEYS=['callstate','result','cust'];
   function escQ(s){return (''+s).replace(/'/g,"\\'");}
-  function custLeafCount(){let n=0;CUSTTREE.forEach(d=>d.groups.forEach(g=>n+=g.leaves.length));return n;}
-  function curSel(){ return recallType==='callstate'?selCallstate:recallType==='result'?selResult:selCust; }
-  function setRecallType(t){
-    recallType=t;
-    document.querySelectorAll('.rc-radio').forEach(r=>r.classList.toggle('on',r.dataset.rt===t));
-    document.getElementById('ddSearch').value='';
-    renderChips();renderDD();
-  }
   function setRcPri(v){
     document.querySelectorAll('#rcPriRow .opt').forEach(o=>o.classList.toggle('on',o.dataset.pri===v));
     document.getElementById('rcCfgBox').style.display = v==='cfg' ? 'block' : 'none';
   }
-  function openDD(e){e&&e.stopPropagation();document.getElementById('ddList').classList.remove('hidden');renderDD();}
-  function closeDD(){document.getElementById('ddList').classList.add('hidden');}
-  function rmChip(v){selCallstate.delete(v);selResult.delete(v);selCust.delete(v);renderChips();renderDD();}
-  function pick(v){curSel().add(v);renderChips();renderDD();document.getElementById('ddSearch').focus();}
-  function renderChips(){
-    const box=document.getElementById('selChips');
-    const items=[...curSel()];
+  function openDD2(e,k){e&&e.stopPropagation();document.querySelectorAll('.dd-list').forEach(l=>l.classList.add('hidden'));document.getElementById('list_'+k).classList.remove('hidden');renderDD2(k);}
+  function pick2(k,v){RC[k].sel.add(v);renderChips2(k);renderDD2(k);document.getElementById('search_'+k).focus();}
+  function rmChip2(k,v){RC[k].sel.delete(v);renderChips2(k);renderDD2(k);}
+  function renderChips2(k){
+    const box=document.getElementById('chips_'+k);
+    const items=[...RC[k].sel];
     box.innerHTML=items.length===0?'<span class="empty">Chưa có dữ liệu</span>'
-      :items.map(v=>`<span class="sel-chip">${v}<span class="rm" onclick="rmChip('${escQ(v)}')">✕</span></span>`).join('');
-    const hint=document.getElementById('rcHint');
-    hint.innerHTML=recallType==='callstate'
-      ? 'Mức <b>tổng</b> của trạng thái cuộc gọi: <b>Trả lời</b> (đã kết nối) / <b>Không trả lời</b> (gộp mọi kết quả không bắt máy). KH có cuộc rơi vào trạng thái đã chọn sẽ được recall.'
-      : recallType==='result'
-      ? '<b>Trạng thái tổng đài</b>: <b>8 mã</b> (map Q.850/FreeSWITCH — FR-009; đã loại "Nghe máy" và 2 trạng thái lưu ở core BE chưa qua tổng đài: Chặn quảng cáo, Danh sách cấm gọi). KH có cuộc rơi vào <b>bất kỳ trạng thái đã chọn</b> sẽ được recall (OR).'
-      : '<b>Phân loại (1 cấp, khai báo trong kịch bản)</b>. Lấy theo <b>phân loại CUỐI CÙNG</b> mà cuộc gọi đi qua trong flow; cuộc có phân loại cuối ∈ các mã đã chọn sẽ được recall (OR). <i>Danh mục thật do kịch bản khai báo (giá trị minh hoạ).</i>';
-    updateTalkBox();
+      :items.map(v=>`<span class="sel-chip">${v}<span class="rm" onclick="rmChip2('${k}','${escQ(v)}')">✕</span></span>`).join('');
+    if(k==='callstate')updateTalkBox();
   }
   function updateTalkBox(){
     const b=document.getElementById('rcTalkBox');
-    if(b) b.style.display=(recallType==='callstate'&&selCallstate.has('Trả lời'))?'block':'none';
+    if(b) b.style.display=RC.callstate.sel.has('Trả lời')?'block':'none';
   }
-  function renderDD(){
-    const list=document.getElementById('ddList');
-    const q=(document.getElementById('ddSearch').value||'').trim().toLowerCase();
-    if(recallType==='callstate'||recallType==='result'){
-      const src=recallType==='callstate'?STATUS_CALLSTATE:CALLSTATUS;
-      const selSet=curSel();
-      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+src.length+' trạng thái';
-      const rows=src.filter(s=>s.name.toLowerCase().includes(q)||s.code.toLowerCase().includes(q));
-      list.innerHTML=rows.map(s=>{const p=selSet.has(s.name);
-        return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name}</div>`;
+  function renderDD2(k){
+    const list=document.getElementById('list_'+k), inp=document.getElementById('search_'+k);
+    const q=(inp.value||'').trim().toLowerCase(), cfg=RC[k];
+    if(cfg.kind==='status'){
+      inp.placeholder='Tìm kiếm | '+cfg.src.length+' trạng thái';
+      const rows=cfg.src.filter(s=>s.name.toLowerCase().includes(q)||s.code.toLowerCase().includes(q));
+      list.innerHTML=rows.map(s=>{const p=cfg.sel.has(s.name);
+        return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick2('${k}','${escQ(s.name)}')"`}>${s.name}</div>`;
       }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }else{
-      // Theo Phân loại — list phẳng 1 cấp (khai báo trong kịch bản)
-      document.getElementById('ddSearch').placeholder='Tìm kiếm | '+PHANLOAI.length+' phân loại';
+      inp.placeholder='Tìm kiếm | '+PHANLOAI.length+' phân loại';
       const rows=PHANLOAI.filter(s=>s.name.toLowerCase().includes(q)||s.desc.toLowerCase().includes(q));
-      list.innerHTML=rows.map(s=>{const p=selCust.has(s.name);
-        return `<div class="dd-item ${p?'picked':''}" title="${s.desc}" ${p?'':`onclick="pick('${escQ(s.name)}')"`}>${s.name} <span style="color:#9AA6B2;font-size:11px">· ${s.desc}</span></div>`;
+      list.innerHTML=rows.map(s=>{const p=cfg.sel.has(s.name);
+        return `<div class="dd-item ${p?'picked':''}" title="${s.desc}" ${p?'':`onclick="pick2('${k}','${escQ(s.name)}')"`}>${s.name} <span style="color:#9AA6B2;font-size:11px">· ${s.desc}</span></div>`;
       }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }
   }
-  function toggleDim(d){openDims.has(d)?openDims.delete(d):openDims.add(d);renderDD();}
-  function toggleC1(k){openC1.has(k)?openC1.delete(k):openC1.add(k);renderDD();}
-  document.addEventListener('click',e=>{if(!e.target.closest('.search-dd'))closeDD();});
-  renderChips();renderDD();
+  document.addEventListener('click',e=>{if(!e.target.closest('.search-dd'))document.querySelectorAll('.dd-list').forEach(l=>l.classList.add('hidden'));});
+  RC_KEYS.forEach(k=>{renderChips2(k);renderDD2(k);});
 </script>
 
 <!-- MERGE FR-005 -> Chi tiet phien (iframe cach ly) -->
