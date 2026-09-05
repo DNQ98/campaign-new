@@ -356,9 +356,9 @@
 
       <div class="rc-or">HOẶC</div>
 
-      <!-- Nhóm 3: Phân loại (kịch bản) -->
+      <!-- Nhóm 3: Trạng thái khách hàng -->
       <div class="rc-cond">
-        <div class="sel-box"><div class="sb-lbl">Phân loại (kịch bản) <span style="font-weight:500;color:#8A96A3">· theo phân loại cuối cùng</span></div><div class="sel-chips" id="chips_cust"></div></div>
+        <div class="sel-box"><div class="sb-lbl">Trạng thái khách hàng <span style="font-weight:500;color:#8A96A3">· theo trạng thái cuối cùng</span></div><div class="sel-chips" id="chips_cust"></div></div>
         <div class="search-dd"><div class="dd-input" onclick="openDD2(event,'cust')"><span class="ic">🔍</span><input id="search_cust" placeholder="Tìm kiếm" oninput="renderDD2('cust')" onfocus="openDD2(event,'cust')"></div><div class="dd-list hidden" id="list_cust"></div></div>
       </div>
 
@@ -505,7 +505,7 @@
         return `<div class="dd-item ${p?'picked':''}" title="${s.code} · ${s.map}" ${p?'':`onclick="pick2('${k}','${escQ(s.name)}')"`}>${s.name}</div>`;
       }).join('')||'<div class="dd-item" style="color:#9AA6B2">Không tìm thấy</div>';
     }else{
-      inp.placeholder='Tìm kiếm | '+PHANLOAI.length+' phân loại';
+      inp.placeholder='Tìm kiếm | '+PHANLOAI.length+' trạng thái';
       const rows=PHANLOAI.filter(s=>s.name.toLowerCase().includes(q)||s.desc.toLowerCase().includes(q));
       list.innerHTML=rows.map(s=>{const p=cfg.sel.has(s.name);
         return `<div class="dd-item ${p?'picked':''}" title="${s.desc}" ${p?'':`onclick="pick2('${k}','${escQ(s.name)}')"`}>${s.name} <span style="color:#9AA6B2;font-size:11px">· ${s.desc}</span></div>`;
@@ -994,7 +994,7 @@
         <div class="cfg-note" style="margin:-4px 0 10px">Cuộc gọi khớp <b>bất kỳ</b> điều kiện ở <b>bất kỳ</b> nhóm nào sẽ được gọi lại — gộp <b>HOẶC (OR)</b>.</div>
         <div class="rbox"><div class="rl">Trạng thái cuộc gọi</div><div class="rc"><span class="rchip">Trả lời<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span></div></div>
         <div class="rbox hl"><div class="rl">Trạng thái tổng đài <small>· 8 mã</small></div><div class="rc"><span class="rchip">Không nghe máy<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span><span class="rchip">Bận<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span></div></div>
-        <div class="rbox"><div class="rl">Phân loại (kịch bản) <small>· phân loại cuối cùng</small></div><div class="rc"><span class="empty">Chưa có dữ liệu</span></div></div>
+        <div class="rbox"><div class="rl">Trạng thái khách hàng <small>· theo trạng thái cuối cùng</small></div><div class="rc"><span class="empty">Chưa có dữ liệu</span></div></div>
 
         <div class="cfg-row" style="margin-top:12px">
           <div class="field"><label>Số lần gọi lại tối đa <span style="color:var(--red)">*</span></label><div class="line"><input value="2"><span class="u">lần</span></div></div>
