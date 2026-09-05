@@ -318,14 +318,16 @@
 
     <!-- EXISTING (không nâng cấp): Thời gian cho phép gọi -->
     <div class="mh" style="margin-top:22px">Thời gian cho phép gọi</div>
+    <div class="mdesc" style="margin:0 0 4px;font-size:12px;color:#41506A;font-weight:600">Tùy chọn</div>
     <div class="radio2">
-      <label onclick="toggleHours(false)"><span class="dot on" id="dAll"></span> Cả ngày</label>
-      <label onclick="toggleHours(true)"><span class="dot" id="dHour"></span> Khung giờ</label>
+      <label onclick="setHours('all')"><span class="dot on" id="dAll"></span> Cả ngày</label>
+      <label onclick="setHours('hour')"><span class="dot" id="dHour"></span> Khung giờ</label>
+      <label onclick="setHours('none')"><span class="dot" id="dNone"></span> Không áp dụng</label>
     </div>
     <div id="hoursBlock" class="hidden">
       <div class="timerow"><div class="miniinput" style="flex:1"><span><span class="k">Từ</span>08:00</span></div><div class="miniinput" style="flex:1"><span><span class="k">Đến</span>18:00</span></div></div>
     </div>
-    <div class="mdesc" style="margin:8px 0 0;font-size:11.5px;color:#8A96A3">Giữ nguyên tính năng hiện có của OMICRM — không thuộc phạm vi nâng cấp.</div>
+    <div class="mdesc" style="margin:8px 0 0;font-size:11.5px;color:#8A96A3">Cả ngày / Khung giờ giữ nguyên tính năng hiện có của OMICRM. <b>Không áp dụng</b> = phiên không ràng buộc khung giờ gọi (bỏ qua giới hạn thời gian trong ngày).</div>
 
     <div class="hr"></div>
 
@@ -395,10 +397,11 @@
     });
   });
 
-  function toggleHours(show){
-    document.getElementById('dHour').classList.toggle('on',show);
-    document.getElementById('dAll').classList.toggle('on',!show);
-    document.getElementById('hoursBlock').classList.toggle('hidden',!show);
+  function setHours(mode){
+    document.getElementById('dAll').classList.toggle('on',mode==='all');
+    document.getElementById('dHour').classList.toggle('on',mode==='hour');
+    document.getElementById('dNone').classList.toggle('on',mode==='none');
+    document.getElementById('hoursBlock').classList.toggle('hidden',mode!=='hour');
   }
   let rangeN=2;
   function addRange(){
@@ -980,8 +983,9 @@
           <span class="daypill on" onclick="this.classList.toggle('on')">T2 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T3 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T4 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T5 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T6 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T7 <span class="d"></span></span><span class="daypill" onclick="this.classList.toggle('on')">CN</span>
         </div>
         <div class="rad2">
-          <label onclick="cfgHours(false)"><span class="dot on" id="cfgAll"></span> Cả ngày</label>
-          <label onclick="cfgHours(true)"><span class="dot" id="cfgHour"></span> Khung giờ</label>
+          <label onclick="cfgHours('all')"><span class="dot on" id="cfgAll"></span> Cả ngày</label>
+          <label onclick="cfgHours('hour')"><span class="dot" id="cfgHour"></span> Khung giờ</label>
+          <label onclick="cfgHours('none')"><span class="dot" id="cfgNone"></span> Không áp dụng</label>
         </div>
         <div id="cfgHoursBox" style="display:none"><div class="cfg-row"><div class="field"><label>Từ</label><div class="line"><input value="08:00"></div></div><div class="field"><label>Đến</label><div class="line"><input value="18:00"></div></div></div></div>
       </div>
@@ -1064,7 +1068,7 @@
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
   function closeCfg(){document.getElementById('cfgOvl').classList.remove('show');document.getElementById('cfgMdl').classList.remove('show');}
   function saveCfg(){closeCfg();}
-  function cfgHours(b){document.getElementById('cfgAll').classList.toggle('on',!b);document.getElementById('cfgHour').classList.toggle('on',b);document.getElementById('cfgHoursBox').style.display=b?'block':'none';}
+  function cfgHours(mode){document.getElementById('cfgAll').classList.toggle('on',mode==='all');document.getElementById('cfgHour').classList.toggle('on',mode==='hour');document.getElementById('cfgNone').classList.toggle('on',mode==='none');document.getElementById('cfgHoursBox').style.display=mode==='hour'?'block':'none';}
   function cfgPri(v){document.getElementById('cfgPriDone').classList.toggle('on',v==='done');document.getElementById('cfgPriCfg').classList.toggle('on',v==='cfg');document.getElementById('cfgPriBox').style.display=v==='cfg'?'block':'none';}
   function switchTab(t){
     document.querySelectorAll('.m-tab').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
