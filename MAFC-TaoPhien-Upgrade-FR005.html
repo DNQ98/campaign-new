@@ -619,14 +619,17 @@
   /* ==== Nút + Modal chỉnh sửa cấu hình phiên (FR-021 nâng cấp) ==== */
   .btn.edit{background:#EEF4FF;color:var(--blue);border:1.5px solid #BBD3F7;}
   .btn.edit:hover{background:#E2EDFF;}
-  .cfgmodal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.98);opacity:0;pointer-events:none;transition:.2s;width:min(680px,94vw);max-height:88vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(16,24,40,.28);z-index:60;}
-  .cfgmodal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
-  .cfg-hd{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:2;}
-  .cfg-hd h3{margin:0;font-size:17px;}
-  .cfg-hd .x{margin-left:auto;cursor:pointer;color:#9AA6B2;font-size:22px;line-height:1;}
-  .cfg-up{background:var(--up-bg);border-bottom:1px solid var(--up-line);padding:9px 24px;font-size:12px;color:#7a5300;display:flex;gap:8px;align-items:center;}
-  .cfg-up .bdg{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--up-badge-tx);background:var(--up-badge-bg);border-radius:5px;padding:2px 7px;}
-  .cfg-body{padding:18px 24px;display:flex;flex-direction:column;gap:18px;}
+  .cfgmodal{position:fixed;top:0;right:0;bottom:0;width:min(660px,96vw);background:#fff;z-index:60;transform:translateX(100%);transition:transform .28s ease;display:none;grid-template-columns:56px 1fr;overflow:hidden;box-shadow:-16px 0 48px rgba(16,24,40,.22);}
+  .cfgmodal.show{display:grid;transform:none;}
+  @media(prefers-reduced-motion:reduce){.cfgmodal{transition:none;}}
+  .cfgmodal .rail{background:var(--rail);display:flex;justify-content:center;padding-top:22px;}
+  .cfgmodal .rail .x{width:34px;height:34px;border-radius:50%;background:#fff;color:#334155;display:grid;place-items:center;font-size:16px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .cfg-panel{display:flex;flex-direction:column;min-width:0;}
+  .cfg-hd{padding:18px 24px 14px;border-bottom:1px solid var(--border);}
+  .cfg-hd h3{margin:0;font-size:18px;}
+  .cfg-up{background:var(--up-bg);border-bottom:1px solid var(--up-line);padding:9px 24px;font-size:12px;line-height:1.5;color:#7a5300;}
+  .cfg-up .bdg{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--up-badge-tx);background:var(--up-badge-bg);border-radius:5px;padding:2px 7px;margin-right:6px;}
+  .cfg-body{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:18px;}
   .cfg-grp .gh{font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--label);margin-bottom:10px;}
   .cfg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .field{background:var(--input);border:1px solid var(--border);border-radius:10px;padding:8px 12px;}
@@ -642,9 +645,27 @@
   .togmini .sw{width:38px;height:22px;border-radius:12px;background:var(--green);position:relative;transition:.15s;flex:none;}
   .togmini .sw::after{content:"";position:absolute;top:2px;left:18px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;}
   .togmini.off .sw{background:#C7CDD6;} .togmini.off .sw::after{left:2px;}
-  .cfg-ft{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;position:sticky;bottom:0;background:#fff;}
+  .cfg-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;background:#fff;}
   .cfg-ft .save{background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;}
   .cfg-ft .cancel{background:#fff;color:var(--sub);border:1px solid var(--border2);border-radius:9px;padding:10px 18px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;}
+  /* recall boxes + day pills + radio (drawer) */
+  .rbox{background:#F4F6F9;border-radius:10px;padding:11px 13px;margin-bottom:10px;}
+  .rbox.hl{border:1.5px solid var(--blue);background:#F5FAFF;}
+  .rbox .rl{font-size:12px;font-weight:700;color:#41506A;margin-bottom:7px;}
+  .rbox .rl small{font-weight:500;color:#8A96A3;}
+  .rbox .rc{display:flex;flex-wrap:wrap;gap:7px;}
+  .rchip{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;}
+  .rchip .rm{cursor:pointer;opacity:.85;}
+  .rbox .empty{font-size:12.5px;color:#9AA6B2;}
+  .daypills{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px;}
+  .daypill{background:#EEF1F5;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;color:#41506A;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .daypill .d{width:7px;height:7px;border-radius:50%;background:var(--blue);}
+  .daypill.on{background:#1F2A44;color:#fff;}
+  .rad2{display:flex;gap:22px;margin:4px 0 8px;}
+  .rad2 label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px;font-weight:600;}
+  .rad2 .dot{width:18px;height:18px;border-radius:50%;border:2px solid #B7C0CB;flex:none;}
+  .rad2 .dot.on{border-color:var(--blue);box-shadow:inset 0 0 0 4px var(--blue);}
+  .cfg-sep{height:1px;background:var(--border);margin:2px 0;}
   .m-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;}
   .m-col{padding:22px 26px;}
   .m-col.left{border-right:1px solid var(--border);}
@@ -914,65 +935,85 @@
 <!-- MODAL: Chỉnh sửa cấu hình phiên (chỉ khi Tạm ngưng) — sửa toàn bộ trừ Kịch bản -->
 <div class="overlay" id="cfgOvl" onclick="closeCfg()"></div>
 <div class="cfgmodal" id="cfgMdl">
-  <div class="cfg-hd"><h3>⚙ Chỉnh sửa cấu hình phiên</h3><span class="x" onclick="closeCfg()">✕</span></div>
-  <div class="cfg-up"><span class="bdg">NÂNG CẤP · FR-021</span> Phiên đang <b>Tạm ngưng</b> — có thể chỉnh sửa <b>toàn bộ cấu hình</b>. Thay đổi áp dụng cho các cuộc gọi <b>chưa thực hiện</b> khi bấm "Bắt đầu lại".</div>
-  <div class="cfg-body">
+  <div class="rail"><div class="x" onclick="closeCfg()">✕</div></div>
+  <div class="cfg-panel">
+    <div class="cfg-hd"><h3>Chỉnh sửa cấu hình phiên</h3></div>
+    <div class="cfg-up"><span class="bdg">NÂNG CẤP · FR-021</span> Phiên đang <b>Tạm ngưng</b> — sửa được <b>toàn bộ cấu hình</b>. Thay đổi áp dụng cho các cuộc gọi <b>chưa thực hiện</b> khi bấm "Bắt đầu lại".</div>
+    <div class="cfg-body">
 
-    <div class="cfg-grp">
-      <div class="gh">Kịch bản callbot</div>
-      <div class="field locked">
-        <label>Kịch bản AI Callbot</label>
-        <div class="lockrow">Bất động sản <span class="lk">🔒 Không thể thay đổi</span></div>
+      <div class="cfg-grp">
+        <div class="gh">Kịch bản &amp; giọng đọc · không đổi</div>
+        <div class="cfg-row">
+          <div class="field locked"><label>Kịch bản AI Callbot</label><div class="lockrow">Bất động sản <span class="lk">🔒</span></div></div>
+          <div class="field locked"><label>Giọng đọc</label><div class="lockrow">Ngọc Anh <span class="lk">🔒</span></div></div>
+        </div>
+        <div class="cfg-note">Không đổi được kịch bản &amp; giọng đọc sau khi phiên đã tạo (data đã map biến theo kịch bản). Muốn đổi → tạo phiên mới.</div>
       </div>
-      <div class="cfg-note">Không cho phép đổi kịch bản sau khi phiên đã tạo — data đã map biến theo kịch bản này. Muốn đổi kịch bản, cần tạo phiên mới.</div>
-    </div>
 
-    <div class="cfg-grp">
-      <div class="gh">Đầu số &amp; hình thức</div>
-      <div class="cfg-row">
-        <div class="field"><label>Đầu số gọi ra</label><div class="line"><select><option>1900 636 999</option><option>02873 007 999</option><option>Tự động xoay vòng đầu số</option></select></div></div>
-        <div class="field"><label>Hình thức</label><div class="line"><select><option>Callbot</option></select></div></div>
+      <div class="cfg-grp">
+        <div class="gh">Đầu số</div>
+        <div class="field"><label>Đầu số <span style="color:var(--red)">*</span></label><div class="line"><span style="color:var(--green);margin-right:6px">✔</span><select style="flex:1"><option>VIHAT</option><option>1900 636 999</option><option>Tự động xoay vòng đầu số</option></select></div></div>
       </div>
-    </div>
 
-    <div class="cfg-grp">
-      <div class="gh">Thời gian cuộc gọi</div>
-      <div class="cfg-row">
-        <div class="field"><label>Thời gian chờ kết nối tối đa</label><div class="line"><input value="30"><span class="u">giây · 5–60</span></div></div>
-        <div class="field"><label>Thời lượng đàm thoại tối đa</label><div class="line"><input value="180"><span class="u">giây · 30–3600</span></div></div>
+      <div class="cfg-grp">
+        <div class="gh">Thời gian cuộc gọi</div>
+        <div class="cfg-row">
+          <div class="field"><label>Thời gian chờ kết nối tối đa</label><div class="line"><input value="30"><span class="u">giây · 5–60</span></div></div>
+          <div class="field"><label>Thời lượng đàm thoại tối đa</label><div class="line"><input value="180"><span class="u">giây · 30–3600</span></div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="cfg-grp">
-      <div class="gh">Khung giờ gọi</div>
-      <div class="cfg-row">
-        <div class="field"><label>Chế độ</label><div class="line"><select><option>Cả ngày</option><option>Theo khung giờ</option></select></div></div>
-        <div class="field"><label>Khung giờ (nếu chọn)</label><div class="line"><input value="08:00 – 18:00"></div></div>
+      <div class="cfg-sep"></div>
+
+      <div class="cfg-grp">
+        <div class="gh">Phân bổ cuộc gọi</div>
+        <div class="cfg-note" style="margin:-4px 0 10px">Hệ thống phân bổ <b style="color:var(--green)">10 cuộc gọi</b> mỗi <b style="color:var(--blue)">30 giây</b></div>
+        <div class="cfg-row">
+          <div class="field"><label>Số cuộc gọi mỗi lần <span style="color:var(--red)">*</span></label><div class="line"><input value="10"><span class="u">cuộc</span></div></div>
+          <div class="field"><label>Khoảng cách gọi giữa các lần <span style="color:var(--red)">*</span></label><div class="line"><input value="30"><span class="u">giây</span></div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="cfg-grp">
-      <div class="gh">Phân bổ cuộc gọi (Cố định)</div>
-      <div class="cfg-row">
-        <div class="field"><label>Số cuộc gọi mỗi lần</label><div class="line"><input value="1"><span class="u">cuộc</span></div></div>
-        <div class="field"><label>Khoảng cách giữa các lần</label><div class="line"><input value="30"><span class="u">giây</span></div></div>
+      <div class="cfg-grp">
+        <div class="gh">Thời gian cho phép gọi</div>
+        <div class="daypills">
+          <span class="daypill on" onclick="this.classList.toggle('on')">T2 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T3 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T4 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T5 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T6 <span class="d"></span></span><span class="daypill on" onclick="this.classList.toggle('on')">T7 <span class="d"></span></span><span class="daypill" onclick="this.classList.toggle('on')">CN</span>
+        </div>
+        <div class="rad2">
+          <label onclick="cfgHours(false)"><span class="dot on" id="cfgAll"></span> Cả ngày</label>
+          <label onclick="cfgHours(true)"><span class="dot" id="cfgHour"></span> Khung giờ</label>
+        </div>
+        <div id="cfgHoursBox" style="display:none"><div class="cfg-row"><div class="field"><label>Từ</label><div class="line"><input value="08:00"></div></div><div class="field"><label>Đến</label><div class="line"><input value="18:00"></div></div></div></div>
       </div>
-    </div>
 
-    <div class="cfg-grp">
-      <div class="gh">Cơ chế gọi lại</div>
-      <div class="togmini" onclick="this.classList.toggle('off')" style="margin-bottom:12px"><span class="sw"></span> Bật cơ chế gọi lại</div>
-      <div class="cfg-row">
-        <div class="field"><label>Số lần gọi lại tối đa</label><div class="line"><input value="2"><span class="u">lần</span></div></div>
-        <div class="field"><label>Khoảng cách giữa các lần gọi lại</label><div class="line"><input value="300"><span class="u">giây</span></div></div>
+      <div class="cfg-sep"></div>
+
+      <div class="cfg-grp">
+        <div class="gh">Cơ chế gọi lại</div>
+        <div class="togmini" onclick="this.classList.toggle('off')" style="margin-bottom:12px"><span class="sw"></span> Bật cơ chế gọi lại</div>
+        <div class="cfg-note" style="margin:-4px 0 10px">Cuộc gọi khớp <b>bất kỳ</b> điều kiện ở <b>bất kỳ</b> nhóm nào sẽ được gọi lại — gộp <b>HOẶC (OR)</b>.</div>
+        <div class="rbox"><div class="rl">Trạng thái cuộc gọi</div><div class="rc"><span class="rchip">Trả lời<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span></div></div>
+        <div class="rbox hl"><div class="rl">Trạng thái tổng đài <small>· 8 mã</small></div><div class="rc"><span class="rchip">Không nghe máy<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span><span class="rchip">Bận<span class="rm" onclick="this.closest('.rchip').remove()">✕</span></span></div></div>
+        <div class="rbox"><div class="rl">Phân loại (kịch bản) <small>· phân loại cuối cùng</small></div><div class="rc"><span class="empty">Chưa có dữ liệu</span></div></div>
+
+        <div class="cfg-row" style="margin-top:12px">
+          <div class="field"><label>Số lần gọi lại tối đa <span style="color:var(--red)">*</span></label><div class="line"><input value="2"><span class="u">lần</span></div></div>
+          <div class="field"><label>Khoảng cách giữa các lần gọi lại <span style="color:var(--red)">*</span></label><div class="line"><input value="300"><span class="u">giây</span></div></div>
+        </div>
+
+        <div class="gh" style="margin:16px 0 8px">Thời điểm gọi lại</div>
+        <div class="rad2" style="flex-direction:column;gap:10px">
+          <label onclick="cfgPri('done')"><span class="dot" id="cfgPriDone"></span> Sau khi data hoàn thành</label>
+          <label onclick="cfgPri('cfg')"><span class="dot on" id="cfgPriCfg"></span> Sau khoảng thời gian cố định</label>
+        </div>
+        <div id="cfgPriBox" class="field" style="max-width:320px"><label>Gọi lại sau khoảng <span style="color:var(--red)">*</span></label><div class="line"><input value="30"><span class="u">phút</span></div></div>
       </div>
-      <div class="cfg-note">Điều kiện gọi lại (Trạng thái cuộc gọi / Trạng thái tổng đài / Phân loại — gộp OR) và Thời điểm gọi lại theo cấu hình phiên; chỉnh chi tiết trong màn cấu hình phân bổ.</div>
-    </div>
 
-  </div>
-  <div class="cfg-ft">
-    <button class="save" onclick="saveCfg()">Lưu thay đổi</button>
-    <button class="cancel" onclick="closeCfg()">Đóng</button>
+    </div>
+    <div class="cfg-ft">
+      <button class="save" onclick="saveCfg()">Cập nhật</button>
+      <button class="cancel" onclick="closeCfg()">Đóng</button>
+    </div>
   </div>
 </div>
 
@@ -1023,6 +1064,8 @@
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
   function closeCfg(){document.getElementById('cfgOvl').classList.remove('show');document.getElementById('cfgMdl').classList.remove('show');}
   function saveCfg(){closeCfg();}
+  function cfgHours(b){document.getElementById('cfgAll').classList.toggle('on',!b);document.getElementById('cfgHour').classList.toggle('on',b);document.getElementById('cfgHoursBox').style.display=b?'block':'none';}
+  function cfgPri(v){document.getElementById('cfgPriDone').classList.toggle('on',v==='done');document.getElementById('cfgPriCfg').classList.toggle('on',v==='cfg');document.getElementById('cfgPriBox').style.display=v==='cfg'?'block':'none';}
   function switchTab(t){
     document.querySelectorAll('.m-tab').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
     document.querySelectorAll('.tabpane').forEach(x=>x.classList.toggle('on',x.dataset.pane===t));
