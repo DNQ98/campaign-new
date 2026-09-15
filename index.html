@@ -651,6 +651,33 @@
   .cfg-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;background:#fff;}
   .cfg-ft .save{background:var(--green);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;}
   .cfg-ft .cancel{background:#fff;color:var(--sub);border:1px solid var(--border2);border-radius:9px;padding:10px 18px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;}
+  /* ==== Lịch sử chỉnh sửa cấu hình (audit log) ==== */
+  .hist-link{font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+  .hist-link:hover{text-decoration:underline;}
+  .histmodal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.98);opacity:0;pointer-events:none;transition:.18s;width:min(720px,94vw);max-height:88vh;overflow:hidden;background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(16,24,40,.28);z-index:80;display:flex;flex-direction:column;}
+  .histmodal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+  .hist-hd{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .hist-hd h3{margin:0;font-size:18px;}
+  .hist-hd .x{margin-left:auto;cursor:pointer;color:#9AA6B2;font-size:22px;line-height:1;}
+  .hist-up{background:var(--up-bg);border-bottom:1px solid var(--up-line);padding:9px 24px;font-size:12px;color:#7a5300;}
+  .hist-up .bdg{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--up-badge-tx);background:var(--up-badge-bg);border-radius:5px;padding:2px 7px;margin-right:6px;}
+  .hist-body{flex:1;overflow-y:auto;padding:16px 24px 22px;}
+  .h-entry{position:relative;padding:0 0 20px 26px;border-left:2px solid var(--border);}
+  .h-entry:last-child{border-left-color:transparent;padding-bottom:2px;}
+  .h-entry::before{content:"";position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 0 1px var(--blue);}
+  .h-entry.base::before{background:#9AA6B2;box-shadow:0 0 0 1px #9AA6B2;}
+  .h-when{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .h-user{font-size:12.5px;color:var(--sub);margin:1px 0 9px;}
+  .h-user b{color:var(--ink);font-weight:600;}
+  .h-changes{display:flex;flex-direction:column;gap:6px;}
+  .h-row{background:var(--input);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+  .h-row .fld{font-weight:600;color:#41506A;min-width:180px;}
+  .h-row .old{color:#9AA6B2;text-decoration:line-through;}
+  .h-row .arr{color:#9AA6B2;}
+  .h-row .new{color:var(--green);font-weight:700;}
+  .h-scope{margin-top:8px;font-size:11.5px;color:var(--sub);display:inline-flex;align-items:center;gap:6px;background:#EEF4FF;color:#2F5FE0;border-radius:6px;padding:3px 9px;}
+  .h-base-note{font-size:12.5px;color:var(--sub);line-height:1.6;}
+  .h-lock{display:inline-block;font-size:11px;color:#8A96A3;background:#F2F4F7;border:1px dashed #C7CDD6;border-radius:6px;padding:2px 8px;margin-top:6px;}
   /* recall boxes + day pills + radio (drawer) */
   .rbox{background:#F4F6F9;border-radius:10px;padding:11px 13px;margin-bottom:10px;}
   .rbox.hl{border:1.5px solid var(--blue);background:#F5FAFF;}
@@ -940,7 +967,7 @@
 <div class="cfgmodal" id="cfgMdl">
   <div class="rail"><div class="x" onclick="closeCfg()">✕</div></div>
   <div class="cfg-panel">
-    <div class="cfg-hd"><h3>Chỉnh sửa cấu hình phiên</h3></div>
+    <div class="cfg-hd" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3>Chỉnh sửa cấu hình phiên</h3><span class="hist-link" onclick="openHist()">🕘 Lịch sử chỉnh sửa</span></div>
     <div class="cfg-up"><span class="bdg">NÂNG CẤP · FR-021</span> Phiên đang <b>Tạm ngưng</b> — sửa được <b>toàn bộ cấu hình</b>. Thay đổi áp dụng cho các cuộc gọi <b>chưa thực hiện</b> khi bấm "Bắt đầu lại".</div>
     <div class="cfg-body">
 
@@ -1021,6 +1048,54 @@
   </div>
 </div>
 
+<!-- MODAL: Lịch sử chỉnh sửa cấu hình phiên (audit log) -->
+<div class="overlay" id="histOvl" onclick="closeHist()"></div>
+<div class="histmodal" id="histMdl">
+  <div class="hist-hd"><h3>🕒 Lịch sử chỉnh sửa cấu hình</h3><span class="x" onclick="closeHist()">✕</span></div>
+  <div class="hist-up"><span class="bdg">NÂNG CẤP · FR-021</span> Ghi lại <b>mọi lần chỉnh sửa cấu hình phiên</b> (ai · khi nào · trường nào · giá trị cũ → mới · phạm vi áp dụng). Kịch bản &amp; Giọng đọc bị khoá nên không xuất hiện (trừ cấu hình ban đầu).</div>
+  <div class="hist-body">
+
+    <div class="h-entry">
+      <div class="h-when">10:45 · 28/08/2026</div>
+      <div class="h-user">bởi <b>Hello Thiên Quân</b> · phiên đang <b>Tạm ngưng</b></div>
+      <div class="h-changes">
+        <div class="h-row"><span class="fld">Thời lượng đàm thoại tối đa</span><span class="old">60 giây</span><span class="arr">→</span><span class="new">120 giây</span></div>
+        <div class="h-row"><span class="fld">Số cuộc gọi mỗi lần</span><span class="old">10</span><span class="arr">→</span><span class="new">15</span></div>
+      </div>
+      <div class="h-scope">⚡ Áp dụng cho <b>7 cuộc chưa thực hiện</b> (khi Bắt đầu lại)</div>
+    </div>
+
+    <div class="h-entry">
+      <div class="h-when">09:30 · 28/08/2026</div>
+      <div class="h-user">bởi <b>Hello Thiên Quân</b></div>
+      <div class="h-changes">
+        <div class="h-row"><span class="fld">Đầu số</span><span class="old">VIHAT</span><span class="arr">→</span><span class="new">1900 636 999</span></div>
+        <div class="h-row"><span class="fld">Thời gian cho phép gọi</span><span class="old">Cả ngày</span><span class="arr">→</span><span class="new">Khung giờ (08:00–18:00)</span></div>
+        <div class="h-row"><span class="fld">Điều kiện gọi lại (Trạng thái tổng đài)</span><span class="old">Không nghe máy</span><span class="arr">→</span><span class="new">Không nghe máy, Bận</span></div>
+      </div>
+      <div class="h-scope">⚡ Áp dụng cho <b>9 cuộc chưa thực hiện</b></div>
+    </div>
+
+    <div class="h-entry">
+      <div class="h-when">08:15 · 28/08/2026</div>
+      <div class="h-user">bởi <b>QUIDN</b></div>
+      <div class="h-changes">
+        <div class="h-row"><span class="fld">Thời gian chờ kết nối tối đa</span><span class="old">30 giây</span><span class="arr">→</span><span class="new">45 giây</span></div>
+        <div class="h-row"><span class="fld">Khoảng cách giữa các lần gọi lại</span><span class="old">300 giây</span><span class="arr">→</span><span class="new">180 giây</span></div>
+      </div>
+      <div class="h-scope">⚡ Áp dụng cho <b>11 cuộc chưa thực hiện</b></div>
+    </div>
+
+    <div class="h-entry base">
+      <div class="h-when">07:50 · 28/08/2026 — Tạo phiên (cấu hình ban đầu)</div>
+      <div class="h-user">bởi <b>Hello Thiên Quân</b></div>
+      <div class="h-base-note">Kịch bản <b>Bất động sản</b> · Giọng đọc <b>Ngọc Anh</b> · Đầu số <b>VIHAT</b> · Thời gian chờ kết nối <b>30s</b> · Thời lượng đàm thoại tối đa <b>60s</b> · Phân bổ <b>10 cuộc / 30s</b> · Thời gian gọi <b>Cả ngày</b> · Recall <b>Bật</b> (Không nghe máy · 2 lần · 300s).</div>
+      <div class="h-lock">🔒 Kịch bản &amp; Giọng đọc khoá từ đây — không đổi được ở các lần chỉnh sửa sau</div>
+    </div>
+
+  </div>
+</div>
+
 <script>
   const ROWS=[
     {icon:'ok',time:'10:31 27/08/2026',sub:'Callbot / Trả lời',cust:'022588173',phone:'8989666666',kb:'Bất động sản'},
@@ -1068,6 +1143,8 @@
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
   function closeCfg(){document.getElementById('cfgOvl').classList.remove('show');document.getElementById('cfgMdl').classList.remove('show');}
   function saveCfg(){closeCfg();}
+  function openHist(){document.getElementById('histOvl').classList.add('show');document.getElementById('histMdl').classList.add('show');}
+  function closeHist(){document.getElementById('histOvl').classList.remove('show');document.getElementById('histMdl').classList.remove('show');}
   function cfgHours(mode){document.getElementById('cfgAll').classList.toggle('on',mode==='all');document.getElementById('cfgHour').classList.toggle('on',mode==='hour');document.getElementById('cfgNone').classList.toggle('on',mode==='none');document.getElementById('cfgHoursBox').style.display=mode==='hour'?'block':'none';}
   function cfgPri(v){document.getElementById('cfgPriDone').classList.toggle('on',v==='done');document.getElementById('cfgPriCfg').classList.toggle('on',v==='cfg');document.getElementById('cfgPriBox').style.display=v==='cfg'?'block':'none';}
   function switchTab(t){
@@ -1079,7 +1156,7 @@
   function closePriority(){document.getElementById('ovl2').classList.remove('show');document.getElementById('pop').classList.remove('show');}
   function pickPr(v){prPick=v;document.querySelectorAll('.opt[data-pr]').forEach(o=>o.classList.toggle('on',o.dataset.pr===v));}
   function confirmAdd(){closePriority();closeAdd();}
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdd();closeCfg();closePriority();}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAdd();closeCfg();closePriority();closeHist();}});
   renderRows(); setState('pause');
 <\/script>
 </script>
