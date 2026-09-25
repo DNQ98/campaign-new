@@ -196,6 +196,26 @@
   .rc-cond{margin-bottom:2px;}
   .rc-or{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:800;color:#9AA6B2;letter-spacing:.1em;margin:12px 0;}
   .rc-or::before,.rc-or::after{content:"";flex:1;height:1px;background:var(--border2);}
+  /* --- Gọi lại theo lịch hẹn (node thu thập) — style dùng chung cho modal Tạo phiên --- */
+  .aptbox{background:#F5FAFF;border:1.5px solid #BBD3F7;border-radius:10px;padding:12px 13px;margin-top:10px;}
+  .aptbox.off{background:#F4F6F9;border-color:var(--border);opacity:.6;}
+  .apt-sub{font-size:11.5px;color:#5B6675;margin:2px 0 9px;line-height:1.5;}
+  .apt-pick{font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#6B7480;margin:4px 0 8px;}
+  .apt-pick .cnt{font-weight:600;color:#8A96A3;text-transform:none;letter-spacing:0;}
+  .apt-node{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E4E9EF;border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;transition:.12s;}
+  .apt-node:last-child{margin-bottom:0;}
+  .apt-node .chk{width:18px;height:18px;border-radius:5px;border:2px solid #B7C0CB;flex:none;display:grid;place-items:center;color:#fff;font-size:11px;}
+  .apt-node.on{border-color:#2F80ED;background:#F5FAFF;}
+  .apt-node.on .chk{background:#2F80ED;border-color:#2F80ED;}
+  .apt-node .nd{flex:1;min-width:0;}
+  .apt-node .nd .nc{font-size:12.5px;font-weight:700;color:#1E2A3A;}
+  .apt-node .nd .nc .code{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#2F80ED;background:#EAF1FE;border-radius:4px;padding:1px 5px;margin-right:6px;}
+  .apt-node .nd .ne{font-size:11px;color:#8A96A3;margin-top:2px;}
+  .ent-badge{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EEF1F5;color:#5B6675;white-space:nowrap;}
+  .ent-badge.time{background:#FFF3DC;color:#B4720A;}
+  .apt-node.dis{cursor:not-allowed;opacity:.55;background:#F7F8FA;}
+  .apt-node.dis .chk{border-color:#D6DEE7;background:#EEF1F5;}
+  .apt-node.dis .nd .nc{color:#8A96A3;}
   .dd-group{padding:9px 14px;font-size:12px;font-weight:800;letter-spacing:.3px;color:#41506A;display:flex;align-items:center;gap:8px;cursor:pointer;background:#FAFBFC;}
   .dd-chev{font-size:10px;color:#9AA6B2;transition:transform .15s;width:10px;}
   .dd-node.closed > .dd-chev{transform:rotate(-90deg);}
@@ -377,6 +397,43 @@
       <div id="rcCfgBox" style="margin-top:12px;max-width:300px">
         <div class="miniinput"><span><span class="k">Gọi lại sau khoảng *</span>30</span><span class="u">phút</span></div>
       </div>
+
+      <!-- ===== NÂNG CẤP: Gọi lại theo lịch hẹn (AI) ===== -->
+      <div class="mh" style="margin:20px 0 8px">Gọi lại theo lịch hẹn <span style="font-weight:600;font-size:12px;color:var(--blue)">· AI bắt thời gian hẹn</span></div>
+      <div class="togrow" id="mApt" onclick="mToggleApt()" style="cursor:pointer;margin-bottom:4px"><span class="toggle"></span> Gọi lại theo lịch hẹn khách hàng</div>
+      <div class="aptbox" id="mAptBox">
+        <div class="apt-sub">Khi cuộc gọi đi qua <b>node thu thập</b> đã chọn và AI bắt được <b>thời gian hẹn</b> (ngày/giờ) → tạo lịch gọi lại <b>đúng thời điểm đó</b>.
+          <br>• Vừa khớp điều kiện recall theo trạng thái vừa có lịch hẹn → <b>ưu tiên GIỜ HẸN</b>.
+          <br>• Lịch hẹn <b>KHÔNG tính vào "Số lần gọi lại tối đa"</b> (là lịch gọi riêng).
+          <br>• Giờ hẹn <b>ngoài khung giờ cho phép gọi</b> → tự động <b>dời vào khung giờ gần nhất</b>.
+          <br>• Không bắt được thời gian → theo cơ chế gọi lại thường.</div>
+        <div class="apt-pick">Chọn node thu thập lịch hẹn <span class="cnt">· đọc từ kịch bản (V6) · <b id="mAptCount">1</b> node đang chọn</span></div>
+        <div class="apt-node on" onclick="mToggleNode(this)">
+          <span class="chk">✓</span>
+          <div class="nd"><div class="nc"><span class="code">8.2</span>Khách hàng báo bận, hẹn gọi lại</div><div class="ne">Intent: CALLBACK · thu thập thời điểm hẹn khách hàng</div></div>
+          <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+        </div>
+        <div class="apt-node" onclick="mToggleNode(this)">
+          <span class="chk">✓</span>
+          <div class="nd"><div class="nc"><span class="code">3.0</span>Chuyển máy — người nghe hẹn giờ gọi lại</div><div class="ne">Intent: CALLBACK · người thân báo thời điểm KH tiện nghe</div></div>
+          <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+        </div>
+        <div class="apt-node" onclick="mToggleNode(this)">
+          <span class="chk">✓</span>
+          <div class="nd"><div class="nc"><span class="code">5.1</span>Thuyết phục xác minh — KH hẹn lại</div><div class="ne">Intent: CALLBACK · KH xin gọi lại khi đang xác minh</div></div>
+          <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+        </div>
+        <div class="apt-node dis" title="Node không thu thập thời gian — không dùng cho lịch hẹn">
+          <span class="chk"></span>
+          <div class="nd"><div class="nc"><span class="code">16</span>Xác minh lại số tiền giải ngân</div><div class="ne">Không thu thập thời gian hẹn</div></div>
+          <span class="ent-badge">MONEY_AMOUNT</span>
+        </div>
+        <div class="apt-node dis" title="Node không thu thập thời gian — không dùng cho lịch hẹn">
+          <span class="chk"></span>
+          <div class="nd"><div class="nc"><span class="code">6</span>Xác minh thông tin khách hàng</div><div class="ne">Không thu thập thời gian hẹn</div></div>
+          <span class="ent-badge">DOB · ADDRESS</span>
+        </div>
+      </div>
     </div>
 
     <div class="foot" style="justify-content:flex-start;margin-top:24px"><button class="primary" onclick="closeModal()">Cập nhật</button><button class="ghost" onclick="closeModal()">Đóng</button></div>
@@ -386,6 +443,8 @@
 <script>
   function openModal(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
   function closeModal(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
+  function mToggleApt(){var t=document.getElementById('mApt').querySelector('.toggle');t.classList.toggle('off');document.getElementById('mAptBox').classList.toggle('off',t.classList.contains('off'));}
+  function mToggleNode(el){if(el.classList.contains('dis'))return;el.classList.toggle('on');document.getElementById('mAptCount').textContent=document.querySelectorAll('#mAptBox .apt-node.on').length;}
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
   document.querySelectorAll('.opt[data-grp]').forEach(o=>{
@@ -687,6 +746,26 @@
   .rchip{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;}
   .rchip .rm{cursor:pointer;opacity:.85;}
   .rbox .empty{font-size:12.5px;color:#9AA6B2;}
+  /* --- Gọi lại theo lịch hẹn (node thu thập) --- */
+  .aptbox{background:#F5FAFF;border:1.5px solid #BBD3F7;border-radius:10px;padding:12px 13px;margin-top:10px;}
+  .aptbox.off{background:#F4F6F9;border-color:var(--border);opacity:.6;}
+  .apt-sub{font-size:11.5px;color:#5B6675;margin:2px 0 9px;line-height:1.5;}
+  .apt-pick{font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--label);margin:4px 0 8px;display:flex;align-items:center;gap:6px;}
+  .apt-pick .cnt{font-weight:600;color:#8A96A3;text-transform:none;letter-spacing:0;}
+  .apt-node{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E4E9EF;border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;transition:.12s;}
+  .apt-node:last-child{margin-bottom:0;}
+  .apt-node .chk{width:18px;height:18px;border-radius:5px;border:2px solid #B7C0CB;flex:none;display:grid;place-items:center;color:#fff;font-size:11px;}
+  .apt-node.on{border-color:var(--blue);background:#F5FAFF;}
+  .apt-node.on .chk{background:var(--blue);border-color:var(--blue);}
+  .apt-node .nd{flex:1;min-width:0;}
+  .apt-node .nd .nc{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .apt-node .nd .nc .code{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--blue);background:#EAF1FE;border-radius:4px;padding:1px 5px;margin-right:6px;}
+  .apt-node .nd .ne{font-size:11px;color:#8A96A3;margin-top:2px;}
+  .ent-badge{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EEF1F5;color:#5B6675;white-space:nowrap;}
+  .ent-badge.time{background:#FFF3DC;color:#B4720A;}
+  .apt-node.dis{cursor:not-allowed;opacity:.55;background:#F7F8FA;}
+  .apt-node.dis .chk{border-color:#D6DEE7;background:#EEF1F5;}
+  .apt-node.dis .nd .nc{color:#8A96A3;}
   .daypills{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px;}
   .daypill{background:#EEF1F5;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;color:#41506A;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
   .daypill .d{width:7px;height:7px;border-radius:50%;background:var(--blue);}
@@ -1038,6 +1117,63 @@
           <label onclick="cfgPri('cfg')"><span class="dot on" id="cfgPriCfg"></span> Sau khoảng thời gian cố định</label>
         </div>
         <div id="cfgPriBox" class="field" style="max-width:320px"><label>Gọi lại sau khoảng <span style="color:var(--red)">*</span></label><div class="line"><input value="30"><span class="u">phút</span></div></div>
+
+        <!-- ===== NÂNG CẤP: Gọi lại theo lịch hẹn (AI) ===== -->
+        <div class="gh" style="margin:18px 0 8px">Gọi lại theo lịch hẹn <small style="font-weight:600;text-transform:none;letter-spacing:0;color:var(--blue)">· AI bắt thời gian hẹn</small></div>
+        <div class="togmini" id="cfgApt" onclick="toggleApt()"><span class="sw"></span> Gọi lại theo lịch hẹn khách hàng</div>
+        <div class="aptbox" id="cfgAptBox">
+          <div class="apt-sub">Khi cuộc gọi đi qua <b>node thu thập</b> đã chọn và AI bắt được <b>thời gian hẹn</b> (ngày/giờ) → tạo lịch gọi lại <b>đúng thời điểm đó</b>.
+            <br>• Nếu cuộc vừa khớp điều kiện recall theo trạng thái vừa có lịch hẹn → <b>ưu tiên GIỜ HẸN</b>.
+            <br>• Lịch hẹn <b>KHÔNG tính vào "Số lần gọi lại tối đa"</b> (là lịch gọi riêng).
+            <br>• Giờ hẹn <b>ngoài khung giờ cho phép gọi</b> → tự động <b>dời vào khung giờ gần nhất</b>.
+            <br>• Không bắt được thời gian → theo cơ chế gọi lại thường.</div>
+          <div class="apt-pick">Chọn node thu thập lịch hẹn <span class="cnt">· đọc từ kịch bản (V6) · <b id="aptCount">1</b> node đang chọn</span></div>
+
+          <div class="apt-node on" onclick="toggleNode(this)">
+            <span class="chk">✓</span>
+            <div class="nd">
+              <div class="nc"><span class="code">8.2</span>Khách hàng báo bận, hẹn gọi lại</div>
+              <div class="ne">Intent: CALLBACK · thu thập thời điểm hẹn khách hàng</div>
+            </div>
+            <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+          </div>
+
+          <div class="apt-node" onclick="toggleNode(this)">
+            <span class="chk">✓</span>
+            <div class="nd">
+              <div class="nc"><span class="code">3.0</span>Chuyển máy — người nghe hẹn giờ gọi lại</div>
+              <div class="ne">Intent: CALLBACK · người thân báo thời điểm KH tiện nghe</div>
+            </div>
+            <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+          </div>
+
+          <div class="apt-node" onclick="toggleNode(this)">
+            <span class="chk">✓</span>
+            <div class="nd">
+              <div class="nc"><span class="code">5.1</span>Thuyết phục xác minh — KH hẹn lại</div>
+              <div class="ne">Intent: CALLBACK · KH xin gọi lại khi đang xác minh</div>
+            </div>
+            <span class="ent-badge time">⏰ TIME_EXPRESSION</span>
+          </div>
+
+          <div class="apt-node dis" title="Node không thu thập thời gian — không dùng cho lịch hẹn">
+            <span class="chk"></span>
+            <div class="nd">
+              <div class="nc"><span class="code">16</span>Xác minh lại số tiền giải ngân</div>
+              <div class="ne">Không thu thập thời gian hẹn</div>
+            </div>
+            <span class="ent-badge">MONEY_AMOUNT</span>
+          </div>
+
+          <div class="apt-node dis" title="Node không thu thập thời gian — không dùng cho lịch hẹn">
+            <span class="chk"></span>
+            <div class="nd">
+              <div class="nc"><span class="code">6</span>Xác minh thông tin khách hàng</div>
+              <div class="ne">Không thu thập thời gian hẹn</div>
+            </div>
+            <span class="ent-badge">DOB · ADDRESS</span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1147,6 +1283,8 @@
   function closeHist(){document.getElementById('histOvl').classList.remove('show');document.getElementById('histMdl').classList.remove('show');}
   function cfgHours(mode){document.getElementById('cfgAll').classList.toggle('on',mode==='all');document.getElementById('cfgHour').classList.toggle('on',mode==='hour');document.getElementById('cfgNone').classList.toggle('on',mode==='none');document.getElementById('cfgHoursBox').style.display=mode==='hour'?'block':'none';}
   function cfgPri(v){document.getElementById('cfgPriDone').classList.toggle('on',v==='done');document.getElementById('cfgPriCfg').classList.toggle('on',v==='cfg');document.getElementById('cfgPriBox').style.display=v==='cfg'?'block':'none';}
+  function toggleApt(){var t=document.getElementById('cfgApt');t.classList.toggle('off');document.getElementById('cfgAptBox').classList.toggle('off',t.classList.contains('off'));}
+  function toggleNode(el){if(el.classList.contains('dis'))return;el.classList.toggle('on');var n=document.querySelectorAll('#cfgAptBox .apt-node.on').length;document.getElementById('aptCount').textContent=n;}
   function switchTab(t){
     document.querySelectorAll('.m-tab').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
     document.querySelectorAll('.tabpane').forEach(x=>x.classList.toggle('on',x.dataset.pane===t));
