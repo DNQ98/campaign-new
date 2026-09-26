@@ -680,6 +680,12 @@
   .leg i.d{width:8px;height:8px;border-radius:2px;display:inline-block;}
   .leg i.done{background:var(--green);} .leg i.todo{background:#E7ECF2;border:1px solid #CBD4DE;} .leg i.drop{background:#C4CCD6;}
   .leg b{color:var(--ink);}
+  .eta{margin-top:10px;background:#fff;border:1px solid #F0E3C2;border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .eta .ic{color:var(--amber);font-size:13px;}
+  .eta .lb{font-size:11.5px;color:var(--sub);font-weight:700;}
+  .eta .val{font-size:15px;font-weight:800;color:var(--ink);}
+  .eta .band{font-size:10.5px;font-weight:700;color:var(--up-badge-tx);background:var(--up-badge-bg);border:1px solid var(--up-line);border-radius:20px;padding:2px 8px;}
+  .eta .etasub{flex-basis:100%;font-size:11px;color:var(--sub);font-weight:600;line-height:1.45;}
   .sb-sub{font-size:10.5px;color:var(--sub);font-weight:600;margin:13px 0 7px;}
   .cells{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start;}
   .cells.c4{grid-template-columns:repeat(4,1fr);}
@@ -958,6 +964,14 @@
               <span><i class="d drop"></i>Bị loại <b>40</b> · 4,0% <span class="q" data-tip="prog_excluded">(?)</span></span>
             </div>
           </div>
+        </div>
+
+        <div class="eta">
+          <span class="ic">⏱</span><span class="lb">Dự kiến hoàn thành</span>
+          <span class="val" id="etaVal">16:30 hôm nay</span>
+          <span class="band" id="etaBand">sai số ±10–15%</span>
+          <span class="q" data-tip="eta">(?)</span>
+          <div class="etasub" id="etaSub">Gọi hết hàng đợi ~15:09 (khoảng 14:37 – 15:41) · nhưng còn <b>20 KH chờ lịch hẹn</b>, muộn nhất <b>16:30</b> → phiên đóng theo lịch hẹn</div>
         </div>
 
         <div class="sb-sub">Trạng thái hiện tại — mỗi KH thuộc đúng 1 trong 7 nhóm, cộng lại = 1.000 <span class="q" data-tip="mece">(?)</span></div>
@@ -1440,11 +1454,13 @@
     if(s==='run'){
       act.innerHTML='<button class="btn pause" onclick="setState(\'pause\')">⏸ Tạm dừng phiên gọi</button>';
       banner.style.display=''; banner.className='banner prep'; banner.innerHTML='⏳ Đang chuẩn bị dữ liệu đến 10:31 27/08/2026';
+      setEta('run');
       stLine.innerHTML='<span style="color:var(--green)">✔</span> <b>Đang xử lý</b> <span class="q" data-tip="hdr_status">(?)</span> <span class="sub">· 820 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND <span class="q" data-tip="hdr_cost">(?)</span></span>';
       startPoll();
     }else{
       act.innerHTML='<button class="btn edit" onclick="openCfg()">⚙ Chỉnh sửa cấu hình</button><button class="btn add" onclick="openAdd()">＋ Bổ sung khách hàng</button><button class="btn resched" onclick="setState(\'run\')">▶ Bắt đầu lại vào lúc 10:31 28/08/2026</button>';
       banner.className='banner'; banner.innerHTML=''; banner.style.display='none';
+      setEta('pause');
       stLine.innerHTML='<span style="color:var(--amber)">⏸</span> <b style="color:var(--amber)">Tạm ngưng</b> <span class="q" data-tip="hdr_status">(?)</span> <span class="sub">· 820 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND <span class="q" data-tip="hdr_cost">(?)</span></span>';
       haltPoll();
     }
@@ -1500,6 +1516,7 @@
   k_cancelled:{t:'Cuộc gọi bị hủy',d:'Cuộc đã xếp hàng chờ quay số nhưng bị bỏ trước khi kịp gọi.',f:'Bị hủy = Do hủy / tạm dừng phiên\n      + Do hết khung giờ cho phép gọi\n15 = 9 + 6',n:'Cũng bị loại khỏi mẫu số tính tỷ lệ.'},
   k_cc_session:{t:'Bị hủy — do hủy / tạm dừng phiên',d:'Người dùng bấm hủy hoặc tạm dừng, các cuộc đang xếp hàng bị bỏ.',f:'Đếm cuộc trong hàng đợi bị bỏ khi phiên chuyển Hủy / Tạm ngưng\n(gồm lượt gọi lại của khách ở ô "Dừng do hủy phiên")',n:''},
   k_cc_window:{t:'Bị hủy — do hết khung giờ cho phép gọi',d:'Tới giờ không được phép gọi nữa, các cuộc còn trong hàng đợi bị bỏ.',f:'Đếm cuộc trong hàng đợi bị bỏ khi hết\n"Thời gian cho phép gọi"',n:'Khách GIỮ NGUYÊN trạng thái hiện tại để gọi tiếp vào khung giờ kế — không bị chốt kết quả.'},
+  eta:{t:'Dự kiến hoàn thành phiên',d:'Ước tính khi nào phiên gọi xong toàn bộ khách còn lại. Đây là con số GẦN ĐÚNG — chấp nhận sai số ±10–15%, và càng về cuối phiên càng sát vì hệ thống tự học tốc độ thực tế.',f:'① Số cuộc còn phải gọi\n   ≈ (Chưa gọi + Đang chờ gọi lại + Đang gọi) × TB cuộc/KH\n   ≈ (320 + 85 + 12) × 1,28 ≈ 534 cuộc\n\n② Thời gian gọi thuần   [phân bổ X cuộc mỗi Y giây]\n   = 534 × (30 ÷ 1) = 16.020 giây ≈ 4 giờ 27 phút\n\n③ Trải lên khung giờ cho phép gọi\n   Bỏ qua quãng ngoài khung giờ và ngày không chọn\n   "Cả ngày" ⇒ không cộng thêm\n   10:42 + 4h27 = 15:09 hôm nay\n\n④ So với lịch hẹn (AI)\n   ETA = max(15:09 ; giờ hẹn muộn nhất 16:30) = 16:30\n\n⑤ Khoảng sai số = ±10–15% thời gian còn lại\n   ±12% của 4h27 ≈ ±32 phút ⇒ 14:37 – 15:41',n:'Phiên chưa chạy đủ dữ liệu thì hiện "Đang tính…". Phiên Tạm ngưng thì đồng hồ dừng. Nếu ETA nhảy xa bất thường → kiểm tra tốc độ phân bổ hoặc điều kiện recall.'},
   denom:{t:'Vì sao mẫu số là 760 chứ không phải 820',d:'Tỷ lệ chỉ nên tính trên những cuộc thật sự tới được tổng đài. Cuộc thất bại (lỗi hệ thống) và cuộc bị hủy (chưa kịp gọi) không phản ánh việc khách có nghe máy hay không, nên bị loại ra.',f:'Mẫu số = Tổng cuộc − Thất bại − Bị hủy\n760 = 820 − 45 − 15',n:'Cách tính này khớp với báo cáo FR-030 để hai nơi không lệch số.'},
 
   cfg_timeout:{t:'Thời gian chờ kết nối tối đa',d:'Chờ khách bắt máy tối đa bao lâu; quá ngưỡng thì tự cúp và tính là không trả lời.',f:'Nhập bằng giây · hợp lệ 5–60 · mặc định 30\nĐể trống = không áp dụng (chờ tới khi nhà mạng tự ngắt)',n:''},
@@ -1525,6 +1542,14 @@
   document.addEventListener('mouseout',function(e){var el=e.target.closest&&e.target.closest('.q[data-tip]');if(el)hideTip();});
   document.addEventListener('scroll',hideTip,true);
 
+  function setEta(m){
+    var v=document.getElementById('etaVal'),b=document.getElementById('etaBand'),u=document.getElementById('etaSub');
+    if(!v)return;
+    if(m==='run'){v.textContent='16:30 hôm nay';v.style.color='';b.textContent='sai số ±10–15%';
+      u.innerHTML='Gọi hết hàng đợi ~15:09 (khoảng 14:37 – 15:41) · nhưng còn <b>20 KH chờ lịch hẹn</b>, muộn nhất <b>16:30</b> → phiên đóng theo lịch hẹn';}
+    else{v.textContent='Đồng hồ đã dừng';v.style.color='var(--sub)';b.textContent='phiên tạm ngưng';
+      u.innerHTML='Còn <b>~534 cuộc</b> (~4 giờ 27 phút gọi) tính theo tốc độ hiện tại. Bấm "Bắt đầu lại" để tính lại thời gian dự kiến.';}
+  }
   function openAdd(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
   function closeAdd(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
