@@ -647,6 +647,47 @@
   .recallline{margin-top:12px;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--ink);}
   .recallline .x{width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:11px;}
 
+  /* ===== NÂNG CẤP FR-021: khối số liệu realtime (KH / Cuộc gọi) ===== */
+  .metarow{display:grid;grid-template-columns:1fr 1fr;gap:16px 40px;margin-bottom:18px;}
+  .statbox{position:relative;border:1.5px solid var(--up-line);background:var(--up-bg);border-radius:12px;padding:16px 15px 14px;margin-bottom:14px;}
+  .statbox>.frtag{position:absolute;top:-10px;left:14px;background:var(--up-badge-bg);color:var(--up-badge-tx);font-family:ui-monospace,Menlo,monospace;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em;border:1px solid var(--up-line);}
+  .sb-head{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+  .sb-title{font-size:11.5px;font-weight:800;letter-spacing:.07em;color:var(--ink);}
+  .sb-title .unit{font-weight:600;letter-spacing:0;color:var(--sub);font-size:11px;text-transform:none;}
+  .sb-upd{margin-left:auto;font-size:10.5px;color:var(--sub);font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+  .sb-upd .rf{cursor:pointer;color:var(--blue);font-size:12px;}
+  .sb-upd.off{color:#9AA6B2;}
+  .trow{display:flex;align-items:center;gap:22px;background:#fff;border:1px solid #F0E3C2;border-radius:10px;padding:12px 14px;}
+  .trow .big .n{font-size:26px;font-weight:800;line-height:1;color:var(--ink);}
+  .trow .big .l{font-size:11px;color:var(--sub);font-weight:600;margin-top:5px;white-space:nowrap;}
+  .trow .prog{flex:1;min-width:0;}
+  .bar{height:10px;border-radius:6px;background:#E7ECF2;overflow:hidden;display:flex;}
+  .bar i{display:block;height:100%;}
+  .bar i.done{background:var(--green);} .bar i.drop{background:#C4CCD6;}
+  .leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:9px;font-size:11.5px;color:var(--sub);font-weight:600;}
+  .leg span{display:inline-flex;align-items:center;gap:5px;}
+  .leg i.d{width:8px;height:8px;border-radius:2px;display:inline-block;}
+  .leg i.done{background:var(--green);} .leg i.todo{background:#E7ECF2;border:1px solid #CBD4DE;} .leg i.drop{background:#C4CCD6;}
+  .leg b{color:var(--ink);}
+  .sb-sub{font-size:10.5px;color:var(--sub);font-weight:600;margin:13px 0 7px;}
+  .cells{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start;}
+  .cells.c4{grid-template-columns:repeat(4,1fr);}
+  .cell{background:#fff;border:1px solid #EFE3C6;border-radius:9px;padding:9px 10px;}
+  .cell .cl{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:flex-start;gap:4px;line-height:1.3;}
+  .cell .cv{font-size:19px;font-weight:800;margin-top:4px;line-height:1;}
+  .cell .cv.g{color:var(--green);} .cell .cv.a{color:var(--amber);} .cell .cv.r{color:var(--red);} .cell .cv.m{color:#6B7684;}
+  .cell .cp{font-size:10.5px;color:var(--sub);font-weight:600;margin-top:3px;}
+  .cell .sublist{margin-top:7px;border-top:1px dashed #E8EDF3;padding-top:6px;display:grid;gap:4px;}
+  .cell .sublist div{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--sub);font-weight:600;line-height:1.25;}
+  .cell .sublist b{color:var(--ink);white-space:nowrap;}
+  .sb-note{font-size:10.5px;color:var(--sub);font-weight:600;margin-top:9px;line-height:1.4;}
+  .cfgbox{border:1px solid var(--border);border-radius:12px;padding:14px 16px 16px;background:#fff;}
+  .cfgbox .cb-title{font-size:11.5px;font-weight:800;letter-spacing:.07em;color:var(--sub);margin-bottom:13px;}
+  .days{display:flex;gap:7px;margin-top:5px;}
+  .day{width:34px;height:30px;border-radius:7px;border:1px solid var(--border2);display:grid;place-items:center;font-size:11.5px;font-weight:700;color:var(--sub);position:relative;background:#fff;}
+  .day.on{background:#2B3445;color:#fff;border-color:#2B3445;}
+  .day .dot{position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:#3B9BFF;}
+
   /* filter + table */
   .filt{display:flex;flex-wrap:wrap;gap:9px;background:#F3F5F8;border-radius:12px;padding:12px 14px;margin:18px 0 0;}
   .filt .f{font-size:13px;color:var(--sub);background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 11px;}
@@ -877,21 +918,123 @@
     </div>
     <div class="ic-right">
       <div class="st" id="stLine"></div>
-      <div class="kpis">
+
+      <div class="metarow">
         <div class="kpi"><div class="k">Ngày tạo</div><div class="v">10:31 27/08/2026</div></div>
         <div class="kpi"><div class="k">Ngày thực hiện</div><div class="v">10:31 27/08/2026</div></div>
-        <div class="kpi"><div class="k">Số lượng khách hàng</div><div class="v" id="kTotal">11</div></div>
-        <div class="kpi"><div class="k">Đang chờ</div><div class="v a" id="kWait">10</div></div>
-        <div class="kpi"><div class="k">Trả lời</div><div class="v g">1</div></div>
-        <div class="kpi"><div class="k">Không trả lời</div><div class="v">0</div></div>
-        <div class="kpi"><div class="k">Cuộc gọi thất bại <span class="q" title="Cuộc không thực hiện được ở tầng điều phối (chưa qua tổng đài)">(?)</span></div><div class="v r">0</div></div>
-        <div class="kpi"><div class="k">Cuộc gọi bị hủy <span class="q" title="Cuộc bị hủy khi tạm dừng/hủy phiên">(?)</span></div><div class="v r">0</div></div>
-        <div class="kpi"><div class="k">Mục đích cuộc gọi</div><div class="v" style="font-weight:600">Không áp dụng</div></div>
-        <div class="kpi"><div class="k">Không hợp lệ</div><div class="v r">0</div></div>
       </div>
-      <div class="allocline"><span class="ic">🗂</span> Phân bổ 1 cuộc gọi mỗi 30s</div>
-      <div class="subline">Cả ngày</div>
-      <div class="recallline"><span class="x">✕</span> Gọi lại khi không nghe máy</div>
+
+      <!-- ===== KHỐI A — KHÁCH HÀNG ===== -->
+      <div class="statbox up">
+        <span class="frtag">NÂNG CẤP · FR-021</span>
+        <div class="sb-head">
+          <span class="sb-title">KHÁCH HÀNG <span class="unit">· đơn vị: KH</span></span>
+          <span class="sb-upd" id="updBadge"><span class="rf" onclick="pollNow()">⟳</span> <span id="updTxt">Cập nhật lúc 10:42:15</span></span>
+        </div>
+
+        <div class="trow">
+          <div class="big"><div class="n" id="kTotal">1.000</div><div class="l">Tổng KH thêm vào phiên</div></div>
+          <div class="prog">
+            <div class="bar"><i class="done" style="width:64%"></i><i class="drop" style="width:4%"></i></div>
+            <div class="leg">
+              <span><i class="d done"></i>Đã gọi <b>640</b> · 64,0%</span>
+              <span><i class="d todo"></i>Chưa gọi <b>320</b> · 32,0%</span>
+              <span><i class="d drop"></i>Bị loại <b>40</b> · 4,0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sb-sub">Trạng thái hiện tại — mỗi KH thuộc đúng 1 nhóm, cộng lại = 1.000</div>
+        <div class="cells">
+          <div class="cell">
+            <div class="cl">Chưa gọi</div>
+            <div class="cv m">320</div><div class="cp">32,0%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Đang gọi <span class="q" title="KH đang có cuộc gọi diễn ra tại thời điểm xem">(?)</span></div>
+            <div class="cv a">12</div><div class="cp">1,2%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Đang chờ gọi lại</div>
+            <div class="cv a">85</div><div class="cp">8,5%</div>
+            <div class="sublist">
+              <div><span>Theo cấu hình recall</span><b>65</b></div>
+              <div><span>Theo lịch hẹn (AI) <span class="q" title="Không trừ vào Số lần gọi lại tối đa — lịch riêng theo giờ KH hẹn (R28)">(?)</span></span><b>20</b></div>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cl">Đã gọi xong <span class="q" title="Đã có kết quả cuối, không còn lượt gọi lại nào">(?)</span></div>
+            <div class="cv g">500</div><div class="cp">50,0%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Không liên hệ được <span class="q" title="Đã dùng hết số lần gọi lại tối đa mà không có cuộc nào kết nối thành công — gồm cả INVALID NUMBER phát hiện khi quay số (Q.850 1/22/28)">(?)</span></div>
+            <div class="cv r">43</div><div class="cp">4,3%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Bị loại khỏi phiên <span class="q" title="KH không phát sinh cuộc gọi nào, bị đưa khỏi hàng đợi ngay từ khâu nạp data">(?)</span></div>
+            <div class="cv r">40</div><div class="cp">4,0%</div>
+            <div class="sublist">
+              <div><span>Số sai định dạng</span><b>22</b></div>
+              <div><span>Trùng số trong phiên</span><b>12</b></div>
+              <div><span>Thuộc DNC / Black list</span><b>6</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== KHỐI B — CUỘC GỌI ===== -->
+      <div class="statbox up">
+        <span class="frtag">NÂNG CẤP · FR-021</span>
+        <div class="sb-head">
+          <span class="sb-title">CUỘC GỌI <span class="unit">· đơn vị: cuộc — 1 KH có thể nhiều cuộc</span></span>
+        </div>
+
+        <div class="trow">
+          <div class="big"><div class="n" id="kCalls">820</div><div class="l">Tổng cuộc gọi đã thực hiện</div></div>
+          <div class="big"><div class="n">1,28</div><div class="l">Trung bình cuộc / KH đã gọi</div></div>
+        </div>
+
+        <div class="sb-sub">Phân rã kết quả — cộng lại = 820</div>
+        <div class="cells c4">
+          <div class="cell">
+            <div class="cl">Trả lời</div>
+            <div class="cv g">520</div><div class="cp">68,4%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Không trả lời</div>
+            <div class="cv m">240</div><div class="cp">31,6%</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Cuộc gọi thất bại <span class="q" title="Cuộc KHÔNG đi qua tổng đài, không có mã SIP: hết cước · lỗi trunk · vượt kênh CCU · đầu số bị chặn không quay được. Không trừ Spin, loại khỏi mẫu số tỷ lệ.">(?)</span></div>
+            <div class="cv r">45</div><div class="cp">— loại khỏi mẫu số</div>
+          </div>
+          <div class="cell">
+            <div class="cl">Bị hủy do hủy phiên <span class="q" title="Cuộc đã xếp hàng đợi nhưng bị hủy khi người dùng hủy phiên / hết khung giờ cho phép gọi">(?)</span></div>
+            <div class="cv r">15</div><div class="cp">— loại khỏi mẫu số</div>
+          </div>
+        </div>
+        <div class="sb-note">Tỷ lệ tính trên <b>760 cuộc đã qua tổng đài</b> (820 − 45 thất bại − 15 bị hủy).</div>
+      </div>
+
+      <!-- ===== KHỐI C — CẤU HÌNH PHIÊN (read-only) ===== -->
+      <div class="cfgbox">
+        <div class="cb-title">CẤU HÌNH PHIÊN</div>
+        <div class="kpis">
+          <div class="kpi"><div class="k">Thời gian chờ kết nối tối đa <span class="q" title="Ngưỡng 5–60 giây (R13)">(?)</span></div><div class="v">30 giây</div></div>
+          <div class="kpi"><div class="k">Thời lượng đàm thoại tối đa <span class="q" title="Ngưỡng 30–3600 giây (R9)">(?)</span></div><div class="v" style="color:var(--sub)">Không áp dụng</div></div>
+          <div class="kpi"><div class="k">Mục đích cuộc gọi</div><div class="v" style="color:var(--sub)">Không áp dụng</div></div>
+          <div class="kpi"><div class="k">Phân bổ</div><div class="v">1 cuộc gọi mỗi 30 giây</div></div>
+        </div>
+        <div class="allocline" style="margin-top:16px"><span class="ic">🕐</span> Khung giờ</div>
+        <div class="days">
+          <div class="day">T2<span class="dot"></span></div><div class="day">T3<span class="dot"></span></div>
+          <div class="day">T4<span class="dot"></span></div><div class="day">T5<span class="dot"></span></div>
+          <div class="day">T6<span class="dot"></span></div><div class="day on">T7<span class="dot"></span></div>
+          <div class="day">CN<span class="dot"></span></div>
+        </div>
+        <div class="subline" style="margin-top:6px">Cả ngày</div>
+        <div class="recallline"><span class="x">✕</span> Gọi lại khi không nghe máy</div>
+      </div>
     </div>
   </div>
 
@@ -900,7 +1043,7 @@
     <span class="f">▽</span><span class="f">Hình thức ▾</span><span class="f">Đầu số ▾</span><span class="f">Trạng thái ▾</span>
     <span class="f">Tag ▾</span><span class="f">Phân loại ▾</span><span class="f">Hộp thư thoại ▾</span><span class="f">Trạng thái tổng đài ▾</span>
   </div>
-  <div class="search">🔍 Tìm kiếm | <span id="cnt">11</span> cuộc gọi</div>
+  <div class="search">🔍 Tìm kiếm | <span id="cnt">820</span> cuộc gọi</div>
 
   <!-- TABLE -->
   <div class="twrap">
@@ -1267,13 +1410,26 @@
     if(s==='run'){
       act.innerHTML='<button class="btn pause" onclick="setState(\'pause\')">⏸ Tạm dừng phiên gọi</button>';
       banner.style.display=''; banner.className='banner prep'; banner.innerHTML='⏳ Đang chuẩn bị dữ liệu đến 10:31 27/08/2026';
-      stLine.innerHTML='<span style="color:var(--green)">✔</span> <b>Đang xử lý</b> <span class="sub">· 1 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+      stLine.innerHTML='<span style="color:var(--green)">✔</span> <b>Đang xử lý</b> <span class="sub">· 820 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+      startPoll();
     }else{
       act.innerHTML='<button class="btn edit" onclick="openCfg()">⚙ Chỉnh sửa cấu hình</button><button class="btn add" onclick="openAdd()">＋ Bổ sung khách hàng</button><button class="btn resched" onclick="setState(\'run\')">▶ Bắt đầu lại vào lúc 10:31 28/08/2026</button>';
       banner.className='banner'; banner.innerHTML=''; banner.style.display='none';
-      stLine.innerHTML='<span style="color:var(--amber)">⏸</span> <b style="color:var(--amber)">Tạm ngưng</b> <span class="sub">· 1 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+      stLine.innerHTML='<span style="color:var(--amber)">⏸</span> <b style="color:var(--amber)">Tạm ngưng</b> <span class="sub">· 820 cuộc gọi đã được thực hiện</span><span class="vnd">0 VND</span>';
+      haltPoll();
     }
   }
+  // Cập nhật realtime: poll 10s khi phiên đang chạy, tự dừng khi tạm ngưng/hoàn thành
+  let pollT=null, clk=[10,42,15];
+  function stamp(){return clk.map(n=>String(n).padStart(2,'0')).join(':');}
+  function tick(){clk[2]+=10; if(clk[2]>=60){clk[2]-=60;clk[1]++;} if(clk[1]>=60){clk[1]-=60;clk[0]++;}
+    document.getElementById('updTxt').textContent='Cập nhật lúc '+stamp();}
+  function pollNow(){if(state==='run')tick();}
+  function startPoll(){stopPoll();document.getElementById('updBadge').classList.remove('off');
+    document.getElementById('updTxt').textContent='Cập nhật lúc '+stamp();pollT=setInterval(tick,10000);}
+  function stopPoll(){if(pollT){clearInterval(pollT);pollT=null;}}
+  function haltPoll(){stopPoll();document.getElementById('updBadge').classList.add('off');
+    document.getElementById('updTxt').textContent='Đã dừng cập nhật · '+stamp();}
   function openAdd(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
   function closeAdd(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
