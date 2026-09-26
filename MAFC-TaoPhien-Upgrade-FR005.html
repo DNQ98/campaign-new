@@ -657,6 +657,8 @@
   .sb-upd{margin-left:auto;font-size:10.5px;color:var(--sub);font-weight:600;display:inline-flex;align-items:center;gap:6px;}
   .sb-upd .rf{cursor:pointer;color:var(--blue);font-size:12px;}
   .sb-upd.off{color:#9AA6B2;}
+  .sb-upd .live{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 3px rgba(27,168,92,.18);}
+  .sb-upd.off .live{background:#B6BFC9;box-shadow:none;}
   .trow{display:flex;align-items:center;gap:22px;background:#fff;border:1px solid #F0E3C2;border-radius:10px;padding:12px 14px;}
   .trow .big .n{font-size:26px;font-weight:800;line-height:1;color:var(--ink);}
   .trow .big .l{font-size:11px;color:var(--sub);font-weight:600;margin-top:5px;white-space:nowrap;}
@@ -929,7 +931,7 @@
         <span class="frtag">NÂNG CẤP · FR-021</span>
         <div class="sb-head">
           <span class="sb-title">KHÁCH HÀNG <span class="unit">· đơn vị: KH</span></span>
-          <span class="sb-upd" id="updBadge"><span class="rf" onclick="pollNow()">⟳</span> <span id="updTxt">Cập nhật lúc 10:42:15</span></span>
+          <span class="sb-upd" id="updBadge"><span class="live"></span> <span id="updTxt">Realtime · 10:42:15</span> <span class="rf" onclick="pollNow()" title="Tải lại thủ công (dự phòng khi mất kết nối realtime)">⟳</span></span>
         </div>
 
         <div class="trow">
@@ -959,19 +961,19 @@
             <div class="cv a">85</div><div class="cp">8,5%</div>
             <div class="sublist">
               <div><span>Theo cấu hình recall</span><b>65</b></div>
-              <div><span>Theo lịch hẹn (AI) <span class="q" title="Không trừ vào Số lần gọi lại tối đa — lịch riêng theo giờ KH hẹn (R28)">(?)</span></span><b>20</b></div>
+              <div><span>Theo lịch hẹn (AI) <span class="q" title="Không trừ vào Số lần gọi lại tối đa (R28). Giờ hẹn rơi ngoài thời gian sống của phiên → GIỮ CHỜ: phiên chưa chuyển Đã hoàn thành khi còn KH chờ lịch hẹn (R35).">(?)</span></span><b>20</b></div>
             </div>
           </div>
           <div class="cell">
-            <div class="cl">Đã gọi xong <span class="q" title="Đã có kết quả cuối, không còn lượt gọi lại nào">(?)</span></div>
+            <div class="cl">Đã gọi xong <span class="q" title="Đã có kết quả cuối, không còn lượt gọi lại nào. Gồm cả KH đang chờ gọi lại tại thời điểm HỦY PHIÊN mà đã từng có cuộc kết nối (R36).">(?)</span></div>
             <div class="cv g">500</div><div class="cp">50,0%</div>
           </div>
           <div class="cell">
-            <div class="cl">Không liên hệ được <span class="q" title="Đã dùng hết số lần gọi lại tối đa mà không có cuộc nào kết nối thành công — gồm cả INVALID NUMBER phát hiện khi quay số (Q.850 1/22/28)">(?)</span></div>
+            <div class="cl">Không liên hệ được <span class="q" title="Đã dùng hết số lần gọi lại tối đa mà không có cuộc nào kết nối thành công — gồm INVALID NUMBER phát hiện khi quay số (Q.850 1/22/28) và KH đang chờ gọi lại lúc HỦY PHIÊN mà chưa từng kết nối (R36).">(?)</span></div>
             <div class="cv r">43</div><div class="cp">4,3%</div>
           </div>
           <div class="cell">
-            <div class="cl">Bị loại khỏi phiên <span class="q" title="KH không phát sinh cuộc gọi nào, bị đưa khỏi hàng đợi ngay từ khâu nạp data">(?)</span></div>
+            <div class="cl">Bị loại khỏi phiên <span class="q" title="KH không phát sinh cuộc gọi nào, bị đưa khỏi hàng đợi ngay từ khâu nạp data. THAY HẲN KPI &quot;Không hợp lệ&quot; cũ của OMICRM (R30).">(?)</span></div>
             <div class="cv r">40</div><div class="cp">4,0%</div>
             <div class="sublist">
               <div><span>Số sai định dạng</span><b>22</b></div>
@@ -1009,8 +1011,12 @@
             <div class="cv r">45</div><div class="cp">— loại khỏi mẫu số</div>
           </div>
           <div class="cell">
-            <div class="cl">Bị hủy do hủy phiên <span class="q" title="Cuộc đã xếp hàng đợi nhưng bị hủy khi người dùng hủy phiên / hết khung giờ cho phép gọi">(?)</span></div>
+            <div class="cl">Cuộc gọi bị hủy <span class="q" title="Cuộc đã xếp hàng đợi nhưng chưa quay số thì bị hủy — gồm cả lượt gọi lại đang chờ khi phiên bị hủy giữa chừng">(?)</span></div>
             <div class="cv r">15</div><div class="cp">— loại khỏi mẫu số</div>
+            <div class="sublist">
+              <div><span>Do hủy / tạm dừng phiên</span><b>9</b></div>
+              <div><span>Do hết khung giờ cho phép gọi</span><b>6</b></div>
+            </div>
           </div>
         </div>
         <div class="sb-note">Tỷ lệ tính trên <b>760 cuộc đã qua tổng đài</b> (820 − 45 thất bại − 15 bị hủy).</div>
@@ -1419,17 +1425,17 @@
       haltPoll();
     }
   }
-  // Cập nhật realtime: poll 10s khi phiên đang chạy, tự dừng khi tạm ngưng/hoàn thành
+  // Cập nhật realtime qua WebSocket (demo: mô phỏng bản tin server đẩy về mỗi 10s)
   let pollT=null, clk=[10,42,15];
   function stamp(){return clk.map(n=>String(n).padStart(2,'0')).join(':');}
   function tick(){clk[2]+=10; if(clk[2]>=60){clk[2]-=60;clk[1]++;} if(clk[1]>=60){clk[1]-=60;clk[0]++;}
-    document.getElementById('updTxt').textContent='Cập nhật lúc '+stamp();}
+    document.getElementById('updTxt').textContent='Realtime · '+stamp();}
   function pollNow(){if(state==='run')tick();}
   function startPoll(){stopPoll();document.getElementById('updBadge').classList.remove('off');
-    document.getElementById('updTxt').textContent='Cập nhật lúc '+stamp();pollT=setInterval(tick,10000);}
+    document.getElementById('updTxt').textContent='Realtime · '+stamp();pollT=setInterval(tick,10000);}
   function stopPoll(){if(pollT){clearInterval(pollT);pollT=null;}}
   function haltPoll(){stopPoll();document.getElementById('updBadge').classList.add('off');
-    document.getElementById('updTxt').textContent='Đã dừng cập nhật · '+stamp();}
+    document.getElementById('updTxt').textContent='Đã ngắt realtime · '+stamp();}
   function openAdd(){document.getElementById('ovl').classList.add('show');document.getElementById('mdl').classList.add('show');}
   function closeAdd(){document.getElementById('ovl').classList.remove('show');document.getElementById('mdl').classList.remove('show');}
   function openCfg(){document.getElementById('cfgOvl').classList.add('show');document.getElementById('cfgMdl').classList.add('show');}
